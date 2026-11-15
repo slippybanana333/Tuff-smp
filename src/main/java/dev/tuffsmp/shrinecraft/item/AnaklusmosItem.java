@@ -43,7 +43,8 @@ public class AnaklusmosItem extends TridentItem {
             .maxDamage(250)
             .attributeModifiers(TridentItem.createAttributeModifiers())
             .component(DataComponentTypes.TOOL, TridentItem.createToolComponent())
-            .enchantable(1)
+            // NO .enchantable(): the legendaries can never be enchanted at the table / anvil.
+            // Riptide 5 comes built in via createStack() (a direct component write needs no enchantable component).
             .component(DataComponentTypes.WEAPON, new WeaponComponent(1))
             .component(DataComponentTypes.UNBREAKABLE, Unit.INSTANCE);
     }
@@ -77,7 +78,7 @@ public class AnaklusmosItem extends TridentItem {
     @Override
     @SuppressWarnings("deprecation")
     public void appendTooltip(ItemStack stack, Item.TooltipContext context, TooltipDisplayComponent display, Consumer<Text> tooltip, TooltipType type) {
-        tooltip.accept(Text.translatable("tooltip.shrinecraft.anaklusmos.1").formatted(Formatting.DARK_AQUA));
+        // NOTE: no "Riptide V" line here - the real enchantment already shows its own line; ours would duplicate it.
         tooltip.accept(Text.translatable("tooltip.shrinecraft.anaklusmos.2").formatted(Formatting.GRAY));
     }
 }

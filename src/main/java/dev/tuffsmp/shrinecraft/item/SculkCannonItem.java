@@ -69,7 +69,7 @@ public class SculkCannonItem extends CrossbowItem {
             .maxCount(1)
             .maxDamage(465)
             .component(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.DEFAULT)
-            .enchantable(1)
+            // NO .enchantable(): the legendaries can never be enchanted at the table / anvil.
             .rarity(Rarity.EPIC)
             .component(DataComponentTypes.UNBREAKABLE, Unit.INSTANCE)
             .component(ModComponents.CANNON_MODE, MODE_VOLLEY);

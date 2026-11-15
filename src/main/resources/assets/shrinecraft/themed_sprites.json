@@ -260,6 +260,7 @@
 "widget/page_backward_highlighted",
 "widget/page_forward",
 "widget/page_forward_highlighted",
+"widget/preedit",
 "widget/scroller",
 "widget/scroller_background",
 "widget/slider",

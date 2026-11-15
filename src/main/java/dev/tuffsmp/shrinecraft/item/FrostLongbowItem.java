@@ -59,7 +59,7 @@ public class FrostLongbowItem extends BowItem {
     public static Item.Settings settings() {
         return new Item.Settings()
             .maxDamage(384)
-            .enchantable(1)
+            // NO .enchantable(): the legendaries can never be enchanted at the table / anvil (Power etc. are built in).
             .rarity(Rarity.EPIC)
             .component(DataComponentTypes.UNBREAKABLE, Unit.INSTANCE);
     }

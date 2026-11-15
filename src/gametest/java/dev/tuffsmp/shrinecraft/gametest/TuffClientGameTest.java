@@ -457,7 +457,7 @@ public class TuffClientGameTest implements FabricClientGameTest {
             step("gui command", () -> {
                 server.runCommand("clear @p");
                 String[][] cases = {{"tuffsmp gui lava", "LOCKED:lava"}, {"tuffsmp gui ocean", "LOCKED:ocean"},
-                    {"tuffsmp gui auto", "DYNAMIC:ocean"}, {"gui sculk", "LOCKED:sculk"}, {"tuffsmp gui off", "OFF:sculk"}};
+                    {"gui sculk", "LOCKED:sculk"}, {"tuffsmp gui off", "OFF:sculk"}};
                 for (String[] c : cases) {
                     context.runOnClient(mc -> mc.player.networkHandler.sendChatCommand(c[0]));
                     context.waitTicks(3);
@@ -469,21 +469,6 @@ public class TuffClientGameTest implements FabricClientGameTest {
                 // the server's /tuffsmp needs permission level 2 (the "op" command is not available on this test server)
                 server.runOnServer(sv -> sv.getPlayerManager().addToOperators(sv.getPlayerManager().getPlayerList().get(0).getPlayerConfigEntry()));
                 context.waitTicks(4);
-                // the five pie-slice zones (a known test config: centre 0,0, first slice = sculk starting at 324 degrees, clockwise, 72 each)
-                writeZones(0, 0, 0, null);
-                String ow = "minecraft:overworld";
-                String[][] spots = {{"10", "-30", "sculk"}, {"30", "-10", "ocean"}, {"20", "25", "arctic"}, {"-20", "25", "lava"}, {"-30", "-10", "end"}};
-                for (String[] sp : spots) {
-                    GuiTheme got = dev.tuffsmp.shrinecraft.client.gui.ZoneDetector.themeAt(ow, Double.parseDouble(sp[0]), Double.parseDouble(sp[1]));
-                    if (got == null || !got.key.equals(sp[2])) {
-                        throw new AssertionError("zone at " + sp[0] + "," + sp[1] + " is " + (got == null ? "none" : got.key) + " but expected " + sp[2]);
-                    }
-                }
-                if (dev.tuffsmp.shrinecraft.client.gui.ZoneDetector.themeAt("minecraft:the_nether", 5, 5) != GuiTheme.LAVA) {
-                    throw new AssertionError("the Nether should be the lava theme");
-                }
-                context.runOnClient(mc -> mc.player.networkHandler.sendChatCommand("tuffsmp gui where"));
-                context.waitTicks(3);
                 context.runOnClient(mc -> mc.player.networkHandler.sendChatCommand("tuffsmp essence @p 3"));
                 context.waitTicks(6);
                 boolean has = server.computeOnServer(sv -> sv.getPlayerManager().getPlayerList().get(0).getInventory()
@@ -497,110 +482,6 @@ public class TuffClientGameTest implements FabricClientGameTest {
                 System.out.println("GUI COMMAND TEST OK");
             });
 
-
-            // ---- zones: hub = no GUI, islands decided by distance, the map picture ----
-            step("zones", () -> {
-                String ow = "minecraft:overworld";
-                // centre 1000,-500; hub radius 50; one extra island of END inside the ocean slice, a LAVA island overlapping the hub
-                String islands = "[{\"name\":\"east-end\",\"theme\":\"end\",\"x\":1400,\"z\":-600,\"radius\":60},"
-                    + "{\"name\":\"hub-lava\",\"theme\":\"lava\",\"x\":1030,\"z\":-500,\"radius\":40}]";
-                writeZones(1000, -500, 50, islands);
-                Object[][] cases = {
-                    {1010, -490, null, "hub (centre) shows NO gui"},
-                    {1020, -500, null, "the hub wins even over an island that overlaps it"},
-                    {1000, -700, "sculk", "pie: north = sculk"},
-                    {1190, -562, "ocean", "pie: 72 degrees = ocean"},
-                    {1118, -338, "arctic", "pie: 144 degrees = arctic"},
-                    {882, -338, "lava", "pie: 216 degrees = lava"},
-                    {810, -562, "end", "pie: 288 degrees = end"},
-                    {1400, -600, "end", "on an island of another theme inside the ocean slice -> the island wins"},
-                    {1480, -600, "end", "20 blocks of water from the island edge (inside the 40 margin) -> still that island"},
-                    {1530, -600, "ocean", "70 blocks from the edge (outside the margin) -> back to the pie slice (ocean)"},
-                };
-                for (Object[] c : cases) {
-                    GuiTheme got = dev.tuffsmp.shrinecraft.client.gui.ZoneDetector.themeAt(ow, ((Integer) c[0]).doubleValue(), ((Integer) c[1]).doubleValue());
-                    String want = (String) c[2];
-                    if ((got == null ? null : got.key) == null ? want != null : !got.key.equals(want)) {
-                        throw new AssertionError("zones: " + c[3] + " - at " + c[0] + "," + c[1] + " got " + (got == null ? "none" : got.key) + " expected " + want);
-                    }
-                }
-                // mark / unmark round trip (a new island changes the answer, removing it brings the pie back)
-                dev.tuffsmp.shrinecraft.client.gui.ZoneDetector.markIsland(GuiTheme.ARCTIC, 700, -900, 100, "test-snow");
-                GuiTheme marked = dev.tuffsmp.shrinecraft.client.gui.ZoneDetector.themeAt(ow, 700, -900);
-                if (marked != GuiTheme.ARCTIC || dev.tuffsmp.shrinecraft.client.gui.ZoneDetector.listIslands().size() != 3) {
-                    throw new AssertionError("zones: gui mark did not add the island (" + marked + ", " + dev.tuffsmp.shrinecraft.client.gui.ZoneDetector.listIslands() + ")");
-                }
-                dev.tuffsmp.shrinecraft.client.gui.ZoneDetector.unmarkNearest(700, -900);
-                GuiTheme back = dev.tuffsmp.shrinecraft.client.gui.ZoneDetector.themeAt(ow, 700, -900);
-                if (back == GuiTheme.ARCTIC || dev.tuffsmp.shrinecraft.client.gui.ZoneDetector.listIslands().size() != 2) {
-                    throw new AssertionError("zones: gui unmark did not remove the island (" + back + ")");
-                }
-                // zone PICTURE: 4 quadrants of 10x10 pixels, 100 blocks per pixel, centre pixel (10,10) = world (1000,-500); transparent corner = no GUI
-                try (net.minecraft.client.texture.NativeImage pic = new net.minecraft.client.texture.NativeImage(20, 20, false)) {
-                    GuiTheme[] q = {GuiTheme.SCULK, GuiTheme.OCEAN, GuiTheme.LAVA, GuiTheme.ARCTIC};      // top-left, top-right, bottom-left, bottom-right
-                    for (int py = 0; py < 20; py++) {
-                        for (int px = 0; px < 20; px++) {
-                            int[] c = dev.tuffsmp.shrinecraft.client.gui.ZoneDetector.pictureColor(q[(py < 10 ? 0 : 2) + (px < 10 ? 0 : 1)]);
-                            boolean hole = px >= 17 && py >= 17;
-                            pic.setColorArgb(px, py, hole ? 0 : (0xFF000000 | (c[0] << 16) | (c[1] << 8) | c[2]));
-                        }
-                    }
-                    java.nio.file.Path dir = net.fabricmc.loader.api.FabricLoader.getInstance().getConfigDir().resolve("shrinecraft");
-                    pic.writeTo(dir.resolve("test_mask.png"));
-                }
-                writeZonesWithMap(1000, -500, 0, "{\"image\":\"test_mask.png\",\"center_pixel\":[10,10],\"blocks_per_pixel\":100}");
-                Object[][] pic = {
-                    {900, -600, "sculk", "picture: top-left quadrant = sculk"},
-                    {1100, -600, "ocean", "picture: top-right quadrant = ocean"},
-                    {900, -400, "lava", "picture: bottom-left quadrant = lava"},
-                    {1100, -400, "arctic", "picture: bottom-right quadrant = arctic"},
-                    {1750, 250, null, "picture: a transparent pixel = no GUI"},
-                    {5000, -500, null, "picture: outside the picture = outside_theme (off)"},
-                };
-                for (Object[] c : pic) {
-                    GuiTheme got = dev.tuffsmp.shrinecraft.client.gui.ZoneDetector.themeAt(ow, ((Integer) c[0]).doubleValue(), ((Integer) c[1]).doubleValue());
-                    String want = (String) c[2];
-                    if ((got == null ? null : got.key) == null ? want != null : !got.key.equals(want)) {
-                        throw new AssertionError("zones: " + c[3] + " - at " + c[0] + "," + c[1] + " got " + (got == null ? "none" : got.key) + " expected " + want);
-                    }
-                }
-                writeZones(1000, -500, 50, islands);
-                // the map picture
-                java.nio.file.Path map = dev.tuffsmp.shrinecraft.client.gui.ZoneDetector.renderMap(600, 0, 1000, -700);
-                if (!java.nio.file.Files.exists(map) || java.nio.file.Files.size(map) < 2000) {
-                    throw new AssertionError("zones: the map picture was not written");
-                }
-                java.nio.file.Files.copy(map, java.nio.file.Path.of("screenshots_zones_map.png"), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                System.out.println("ZONES TEST OK -> " + map);
-            });
-
-
-            // ---- the REAL zone picture + zones.json from the project root (the files the owner gets), checked at known world spots ----
-            step("zones real", () -> {
-                java.nio.file.Path root = java.nio.file.Path.of("").toAbsolutePath().resolve("../../..").normalize();
-                java.nio.file.Path dir = net.fabricmc.loader.api.FabricLoader.getInstance().getConfigDir().resolve("shrinecraft");
-                java.nio.file.Files.createDirectories(dir);
-                java.nio.file.Files.copy(root.resolve("zones.json"), dir.resolve("zones.json"), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                java.nio.file.Files.copy(root.resolve("zones_mask.png"), dir.resolve("zones_mask.png"), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                String msg = dev.tuffsmp.shrinecraft.client.gui.ZoneDetector.load();
-                System.out.println("ZONES REAL: " + msg);
-                String ow = "minecraft:overworld";
-                Object[][] cases = {
-                    {0, -1800, "sculk", "north"}, {1700, -500, "ocean", "east-north-east"}, {900, 1200, "arctic", "south-east"},
-                    {-900, 1200, "lava", "south-west"}, {-1700, -500, "end", "west-north-west"},
-                    {0, 40, null, "the hub (no gui)"}, {3100, 0, null, "far outside the circle"},
-                };
-                for (Object[] c : cases) {
-                    GuiTheme got = dev.tuffsmp.shrinecraft.client.gui.ZoneDetector.themeAt(ow, ((Integer) c[0]).doubleValue(), ((Integer) c[1]).doubleValue());
-                    String want = (String) c[2];
-                    if ((got == null ? null : got.key) == null ? want != null : !got.key.equals(want)) {
-                        throw new AssertionError("zones real: " + c[3] + " at " + c[0] + "," + c[1] + " got " + (got == null ? "none" : got.key) + " expected " + want);
-                    }
-                }
-                java.nio.file.Path map = dev.tuffsmp.shrinecraft.client.gui.ZoneDetector.renderMap(900, 2650, 0, 0);
-                java.nio.file.Files.copy(map, root.resolve("zones_check_map.png"), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                System.out.println("ZONES REAL TEST OK");
-            });
 
             // ---- inventory GUI with every item (vanilla + the five themes) ----
             step("inventory", () -> {
@@ -990,30 +871,6 @@ public class TuffClientGameTest implements FabricClientGameTest {
         if (!problems.isEmpty()) {
             throw new AssertionError("Client game test problems:\n" + String.join("\n", problems));
         }
-    }
-
-    /** Writes a known config/shrinecraft/zones.json for the tests (centre, hub radius, optional islands JSON array) and loads it. */
-    private static void writeZones(int cx, int cz, int hub, String islandsJson) throws java.io.IOException {
-        java.nio.file.Path f = net.fabricmc.loader.api.FabricLoader.getInstance().getConfigDir().resolve("shrinecraft").resolve("zones.json");
-        java.nio.file.Files.createDirectories(f.getParent());
-        String json = "{\"dimension\":\"minecraft:overworld\",\"center\":[" + cx + "," + cz + "],\"start_angle\":324,\"inner_radius\":" + hub
-            + ",\"hub_theme\":\"off\",\"outer_radius\":100000,\"outside_theme\":\"off\",\"island_margin\":40,\"islands\":" + (islandsJson == null ? "[]" : islandsJson)
-            + ",\"zones\":[{\"theme\":\"sculk\",\"degrees\":72},{\"theme\":\"ocean\",\"degrees\":72},{\"theme\":\"arctic\",\"degrees\":72},"
-            + "{\"theme\":\"lava\",\"degrees\":72},{\"theme\":\"end\",\"degrees\":72}],"
-            + "\"other_dimensions\":{\"minecraft:the_nether\":\"lava\",\"minecraft:the_end\":\"end\"}}";
-        java.nio.file.Files.writeString(f, json);
-        dev.tuffsmp.shrinecraft.client.gui.ZoneDetector.load();
-    }
-
-    /** Same as writeZones but with a "map" block (the zone picture) and no islands. */
-    private static void writeZonesWithMap(int cx, int cz, int hub, String mapJson) throws java.io.IOException {
-        java.nio.file.Path f = net.fabricmc.loader.api.FabricLoader.getInstance().getConfigDir().resolve("shrinecraft").resolve("zones.json");
-        String json = "{\"dimension\":\"minecraft:overworld\",\"center\":[" + cx + "," + cz + "],\"start_angle\":324,\"inner_radius\":" + hub
-            + ",\"hub_theme\":\"off\",\"outer_radius\":100000,\"outside_theme\":\"off\",\"map\":" + mapJson
-            + ",\"zones\":[{\"theme\":\"sculk\",\"degrees\":72},{\"theme\":\"ocean\",\"degrees\":72},{\"theme\":\"arctic\",\"degrees\":72},"
-            + "{\"theme\":\"lava\",\"degrees\":72},{\"theme\":\"end\",\"degrees\":72}]}";
-        java.nio.file.Files.writeString(f, json);
-        dev.tuffsmp.shrinecraft.client.gui.ZoneDetector.load();
     }
 
     /** A bare screen that draws one item stack very large in an inventory-slot style (the 'gui' display context, zoomed in). */

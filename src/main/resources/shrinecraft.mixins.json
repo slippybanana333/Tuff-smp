@@ -4,8 +4,10 @@
   "package": "dev.tuffsmp.shrinecraft.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "AnvilScreenHandlerMixin",
     "DamageSourcesMixin",
     "EntityMixin",
+    "ForgingScreenHandlerAccessor",
     "HorseInventoryMixin",
     "LivingEntityMixin",
     "ServerPlayNetworkHandlerMixin",

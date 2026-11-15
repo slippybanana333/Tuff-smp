@@ -14,6 +14,8 @@ __pycache__/
 .vscode/
 *.iml
 .DS_Store
+# the owner's personal Obsidian notes vault - never commit
+.obsidian/
 
 # Third-party (Mojang / Microsoft) reference art used only by the Python art tools - NOT redistributed here.
 # Re-create it from your own Minecraft 1.21.11 install: python3 tools/make_vanilla_refs.py (vanilla models/sprites/GUI); the netherite

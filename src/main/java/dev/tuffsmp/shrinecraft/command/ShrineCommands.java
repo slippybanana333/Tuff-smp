@@ -3,6 +3,7 @@ package dev.tuffsmp.shrinecraft.command;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import dev.tuffsmp.shrinecraft.ShrineCraft;
 import dev.tuffsmp.shrinecraft.ability.TrustManager;
 import dev.tuffsmp.shrinecraft.shrine.ShrineRecipe;
 import dev.tuffsmp.shrinecraft.shrine.ShrineRecipes;
@@ -50,6 +51,25 @@ public final class ShrineCommands {
             dispatcher.register(trust("trust"));
             dispatcher.register(essence("essence"));
         });
+
+        // DEV helper: put an empty file named "selftest-on" in the server's run directory (or start with
+        // -Dtuffsmp.selftest=1) and the built-in self-test runs automatically a few seconds after the world
+        // loads (the bash server_selftest.sh types the console commands for you; the file / flag exists so the
+        // same test also works on Windows / from IDE run configs without console typing). The file is a
+        // one-shot: it is deleted when read.
+        boolean auto = Boolean.getBoolean("tuffsmp.selftest");
+        java.nio.file.Path flagFile = net.fabricmc.loader.api.FabricLoader.getInstance().getGameDir().resolve("selftest-on");
+        if (!auto) {
+            try {
+                auto = java.nio.file.Files.deleteIfExists(flagFile);
+            } catch (java.io.IOException e) {
+                ShrineCraft.LOGGER.warn("could not read the selftest-on flag file: {}", e.toString());
+            }
+        }
+        if (auto) {
+            SelfTest.registerAutoRun();
+            ShrineCraft.LOGGER.info("self-test auto-run armed (selftest-on file / -Dtuffsmp.selftest=1).");
+        }
     }
 
     // ------------------------------------------------------------------ trust (everyone)
@@ -126,17 +146,12 @@ public final class ShrineCommands {
     /** "/tuffsmp gui ..." is handled on the CLIENT (client/gui/GuiCommand.java catches the typed text before it is sent). This only feeds tab-completion. */
     private static LiteralArgumentBuilder<ServerCommandSource> guiHint() {
         LiteralArgumentBuilder<ServerCommandSource> gui = CommandManager.literal("gui").executes(ctx -> {
-            ctx.getSource().sendFeedback(() -> Text.literal("/tuffsmp gui <ocean|lava|sculk|arctic|end|auto|off> needs the Tuff SMP mod on your own client.").formatted(Formatting.YELLOW), false);
+            ctx.getSource().sendFeedback(() -> Text.literal("/tuffsmp gui <ocean|lava|sculk|arctic|end|off> needs the Tuff SMP mod on your own client.").formatted(Formatting.YELLOW), false);
             return 0;
         });
-        for (String w : new String[] {"off", "auto", "where", "reload", "ocean", "lava", "sculk", "arctic", "end", "islands", "unmark", "map"}) {
+        for (String w : new String[] {"off", "ocean", "lava", "sculk", "arctic", "end"}) {
             gui.then(CommandManager.literal(w).executes(ctx -> 0));
         }
-        LiteralArgumentBuilder<ServerCommandSource> mark = CommandManager.literal("mark");
-        for (String t : new String[] {"ocean", "lava", "sculk", "arctic", "end"}) {
-            mark.then(CommandManager.literal(t).executes(ctx -> 0));
-        }
-        gui.then(mark);
         return gui;
     }
 

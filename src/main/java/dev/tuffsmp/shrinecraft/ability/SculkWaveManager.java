@@ -1,12 +1,9 @@
 package dev.tuffsmp.shrinecraft.ability;
 
 import dev.tuffsmp.shrinecraft.item.SculkMaceItem;
-import dev.tuffsmp.shrinecraft.registry.ModKeys;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.block.BlockState;
@@ -27,50 +24,46 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-/** Runs the ground shockwaves of the Sculk Mace's "Sculk Wave" ability. */
+/**
+ * Runs the shockwaves of the Sculk Mace's "Sculk Wave" ability.
+ *
+ * Each melee hit DURING the wave window blasts a RADIAL shockwave from the thing that was hit: everything alive
+ * inside SculkMaceItem.WAVE_RADIUS takes SculkMaceItem.WAVE_DAMAGE instantly (the "sculk_wave" damage type is in
+ * the vanilla bypasses_armor tag, so armor does not reduce it). You, your trusted players and spectators are never
+ * touched. The visible sculk ring then expands outward for looks only.
+ *
+ * (It used to be a travelling line-wave that only hurt what lay in its path - the owner wanted a real blast radius.)
+ */
 public final class SculkWaveManager {
     private SculkWaveManager() {}
 
-    private static final class Wave {
+    /** Just the visible ring: it expands and then goes away; the damage already happened at launch. */
+    private static final class Ring {
         final RegistryKey<World> dimension;
-        final UUID owner;
-        final Vec3d origin;
-        final Vec3d dir;
+        final Vec3d center;
         double travelled = 0;
-        double lastY;
-        final Set<UUID> alreadyHit = new HashSet<>();
 
-        Wave(RegistryKey<World> dimension, UUID owner, Vec3d origin, Vec3d dir) {
+        Ring(RegistryKey<World> dimension, Vec3d center) {
             this.dimension = dimension;
-            this.owner = owner;
-            this.origin = origin;
-            this.dir = dir;
-            this.lastY = origin.y;
+            this.center = center;
         }
     }
 
-    private static final List<Wave> WAVES = new ArrayList<>();
+    private static final List<Ring> RINGS = new ArrayList<>();
 
     public static void register() {
         ServerTickEvents.END_SERVER_TICK.register(SculkWaveManager::tick);
     }
 
-    /** Starts a shockwave from the attacker toward the thing they just hit (falls back to where they look). */
+    /** Blasts a radial shockwave from the thing the attacker just hit. */
     public static void launch(ServerWorld world, ServerPlayerEntity attacker, LivingEntity target) {
-        Vec3d toTarget = new Vec3d(target.getX() - attacker.getX(), 0, target.getZ() - attacker.getZ());
-        if (toTarget.lengthSquared() < 1.0E-4) {
-            Vec3d look = attacker.getRotationVec(1.0F);
-            toTarget = new Vec3d(look.x, 0, look.z);
-        }
-        if (toTarget.lengthSquared() < 1.0E-4) {
-            toTarget = new Vec3d(0, 0, 1);
-        }
-        Vec3d dir = toTarget.normalize();
-        WAVES.add(new Wave(world.getRegistryKey(), attacker.getUuid(), attacker.getEntityPos(), dir));
-        world.playSound(null, attacker.getX(), attacker.getY(), attacker.getZ(), SoundEvents.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.PLAYERS, 0.5F, 1.8F);
+        Vec3d center = target.getEntityPos();
+        damage(world, attacker, center);
+        RINGS.add(new Ring(world.getRegistryKey(), center));
+        world.playSound(null, center.x, center.y, center.z, SoundEvents.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.PLAYERS, 0.5F, 1.8F);
     }
 
-    /** Runs the wave simulation by hand (the self-test uses this because it cannot wait for real ticks). */
+    /** Runs the blast visuals by hand (the self-test uses this because it cannot wait for real ticks). */
     public static void tickForTest(MinecraftServer server, int ticks) {
         for (int i = 0; i < ticks; i++) {
             tick(server);
@@ -78,62 +71,54 @@ public final class SculkWaveManager {
     }
 
     private static void tick(MinecraftServer server) {
-        Iterator<Wave> it = WAVES.iterator();
+        Iterator<Ring> it = RINGS.iterator();
         while (it.hasNext()) {
-            Wave wave = it.next();
-            ServerWorld world = server.getWorld(wave.dimension);
-            if (world == null || !advance(world, wave)) {
+            Ring ring = it.next();
+            ServerWorld world = server.getWorld(ring.dimension);
+            if (world == null) {
                 it.remove();
+                continue;
             }
-        }
-    }
-
-    /** @return false when the wave is finished (range reached or blocked). */
-    private static boolean advance(ServerWorld world, Wave wave) {
-        double steps = SculkMaceItem.WAVE_SPEED;
-        double end = Math.min(SculkMaceItem.WAVE_RANGE, wave.travelled + steps);
-        Vec3d side = new Vec3d(-wave.dir.z, 0, wave.dir.x);
-        ServerPlayerEntity owner = world.getServer().getPlayerManager().getPlayer(wave.owner);
-        // Walk the wave forward in 0.5 block increments so it never skips a thin target.
-        for (double d = wave.travelled + 0.5; d <= end + 1.0E-6; d += 0.5) {
-            Vec3d flat = wave.origin.add(wave.dir.multiply(d));
-            Double groundY = findGround(world, flat.x, wave.lastY, flat.z);
-            if (groundY == null) {
-                return false; // wall or cliff
+            ring.travelled += SculkMaceItem.WAVE_SPEED;
+            if (ring.travelled > SculkMaceItem.WAVE_RADIUS) {
+                it.remove();
+                continue;
             }
-            wave.lastY = groundY;
-            Vec3d p = new Vec3d(flat.x, groundY, flat.z);
-            drawWave(world, p, side);
-            damage(world, wave, owner, p);
-        }
-        wave.travelled = end;
-        return end < SculkMaceItem.WAVE_RANGE;
-    }
-
-    private static void drawWave(ServerWorld world, Vec3d p, Vec3d side) {
-        BlockStateParticleEffect sculk = new BlockStateParticleEffect(ParticleTypes.BLOCK, Blocks.SCULK.getDefaultState());
-        double half = SculkMaceItem.WAVE_WIDTH / 2.0;
-        for (double o = -half; o <= half + 1.0E-6; o += 0.75) {
-            double x = p.x + side.x * o;
-            double z = p.z + side.z * o;
-            world.spawnParticles(sculk, x, p.y + 0.15, z, 2, 0.1, 0.1, 0.1, 0.02);
-            world.spawnParticles(ParticleTypes.SCULK_SOUL, x, p.y + 0.3, z, 1, 0.1, 0.2, 0.1, 0.02);
+            drawRing(world, ring.center, ring.travelled);
         }
     }
 
-    private static void damage(ServerWorld world, Wave wave, ServerPlayerEntity owner, Vec3d p) {
-        double half = SculkMaceItem.WAVE_WIDTH / 2.0 + 0.3;
-        Box box = new Box(p.x - half, p.y - 0.5, p.z - half, p.x + half, p.y + 2.5, p.z + half);
+    /** The blast itself: everything alive within WAVE_RADIUS of the hit (except the attacker + trusted) takes the damage. */
+    private static void damage(ServerWorld world, ServerPlayerEntity owner, Vec3d center) {
+        double r = SculkMaceItem.WAVE_RADIUS;
+        Box box = new Box(center.x - r, center.y - r, center.z - r, center.x + r, center.y + r, center.z + r);
         DamageSource source = new DamageSource(
-            world.getRegistryManager().getOrThrow(RegistryKeys.DAMAGE_TYPE).getOrThrow(ModKeys.SCULK_WAVE), owner, owner);
-        for (LivingEntity e : world.getEntitiesByClass(LivingEntity.class, box, le -> le.isAlive() && !le.isSpectator() && !le.getUuid().equals(wave.owner))) {
-            if (wave.alreadyHit.add(e.getUuid()) && !TrustManager.trusts(owner, e)) {
+            world.getRegistryManager().getOrThrow(RegistryKeys.DAMAGE_TYPE).getOrThrow(dev.tuffsmp.shrinecraft.registry.ModKeys.SCULK_WAVE), owner, owner);
+        for (LivingEntity e : world.getEntitiesByClass(LivingEntity.class, box, le -> le.isAlive() && !le.isSpectator()
+                && !le.getUuid().equals(owner.getUuid()))) {
+            if (!TrustManager.trusts(owner, e)) {
                 e.damage(world, source, SculkMaceItem.WAVE_DAMAGE);
             }
         }
     }
 
-    /** Finds the walkable ground height at (x, z) within a few blocks of lastY; null if the wave should stop. */
+    /** A ring of sculk particles at walkable ground height, expanding outward from the blast centre. */
+    private static void drawRing(ServerWorld world, Vec3d center, double radius) {
+        BlockStateParticleEffect sculk = new BlockStateParticleEffect(ParticleTypes.BLOCK, Blocks.SCULK.getDefaultState());
+        Double groundY = findGround(world, center.x, center.y, center.z);
+        double y = groundY == null ? center.y : groundY;
+        // 24 points around the circle; close enough that the ring looks solid.
+        int points = 24;
+        for (int i = 0; i < points; i++) {
+            double angle = (Math.PI * 2.0 * i) / points;
+            double x = center.x + Math.cos(angle) * radius;
+            double z = center.z + Math.sin(angle) * radius;
+            world.spawnParticles(sculk, x, y + 0.15, z, 2, 0.1, 0.1, 0.1, 0.02);
+            world.spawnParticles(ParticleTypes.SCULK_SOUL, x, y + 0.3, z, 1, 0.1, 0.2, 0.1, 0.02);
+        }
+    }
+
+    /** Finds the walkable ground height at (x, z) within a few blocks of lastY; null if there is none. */
     private static Double findGround(ServerWorld world, double x, double lastY, double z) {
         int bx = (int) Math.floor(x);
         int bz = (int) Math.floor(z);

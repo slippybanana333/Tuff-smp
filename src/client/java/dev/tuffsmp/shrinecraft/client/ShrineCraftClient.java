@@ -30,7 +30,6 @@ public class ShrineCraftClient implements ClientModInitializer {
 
         // GUI backgrounds: load the settings file and load all five textures ONCE at startup (never a resource reload).
         GuiSettings.load();
-        ShrineCraft.LOGGER.info(dev.tuffsmp.shrinecraft.client.gui.ZoneDetector.load());
         GuiCommand.register();
         ClientLifecycleEvents.CLIENT_STARTED.register(GuiBackgrounds::preload);
 

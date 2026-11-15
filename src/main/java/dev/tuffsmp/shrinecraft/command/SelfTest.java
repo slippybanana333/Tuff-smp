@@ -28,6 +28,7 @@ import dev.tuffsmp.shrinecraft.shrine.ShrineMenu;
 import dev.tuffsmp.shrinecraft.shrine.ShrineRecipe;
 import dev.tuffsmp.shrinecraft.shrine.ShrineRecipes;
 import dev.tuffsmp.shrinecraft.shrine.ShrineState;
+import dev.tuffsmp.shrinecraft.util.Enchants;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -68,6 +69,7 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.registry.tag.EnchantmentTags;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.screen.AnvilScreenHandler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -101,8 +103,7 @@ final class SelfTest {
         this.reg = server.getRegistryManager();
     }
 
-    static int run(ServerCommandSource source) {
-        SelfTest t = new SelfTest(source);
+    static int run(ServerCommandSource source) {        SelfTest t = new SelfTest(source);
         // The tests drop items (mined stone -> cobblestone, Shrine ingredients like sculk catalysts) and XP orbs next to the test spot.
         // Remember what was lying there BEFORE, and remove only what the test added afterwards, so spawn is left exactly as it was.
         net.minecraft.util.math.Box area = new net.minecraft.util.math.Box(-56, t.world.getBottomY(), -56, 72, t.world.getTopYInclusive() + 1, 72);
@@ -119,6 +120,36 @@ final class SelfTest {
             });
         }
         return t.failures.isEmpty() ? 1 : 0;
+    }
+
+    /**
+     * Dev-only: starting the server with -Dtuffsmp.selftest=1 runs the self-test automatically (a few seconds after
+     * the world loads). It mimics tools/server_selftest.sh: forceload the test chunks first (entity checks need
+     * ticking chunks and nobody is online), then run the command as the server.
+     */
+    static void registerAutoRun() {
+        net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+            net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK.register(s -> {
+                if (s != server) {
+                    return;
+                }
+                int t = s.getTicks();
+                if (t == 200) {
+                    // entity lookups need ticking chunks and nobody is online in this test
+                    run(s, "forceload add -16 -16 32 32");
+                } else if (t == 300) {
+                    run(s, "tuffsmp selftest");
+                }
+            });
+        });
+    }
+
+    private static void run(net.minecraft.server.MinecraftServer s, String command) {
+        try {
+            s.getCommandManager().getDispatcher().execute(command, s.getCommandSource());
+        } catch (com.mojang.brigadier.exceptions.CommandSyntaxException e) {
+            ShrineCraft.LOGGER.warn("[SELFTEST] auto-run command failed: {}", e.toString());
+        }
     }
 
     // ------------------------------------------------------------------ plumbing
@@ -236,6 +267,7 @@ final class SelfTest {
         section("N. Anaklusmos - Riptide 5", this::testTrident);
         section("O. Silver's Spawn Orb", this::testOrb);
         section("P. Strange Cape + recipes", this::testMisc);
+        section("Q. Legendaries cannot be enchanted (table + anvil)", this::testNoEnchanting);
 
         fake.getInventory().clear();
         say("=== Tuff SMP self-test: " + passed + " passed, " + failures.size() + " failed ===");
@@ -270,7 +302,7 @@ final class SelfTest {
         check("Cutlass: NO Knockback, NO Fire Aspect", level(cut, Enchantments.KNOCKBACK) == 0 && level(cut, Enchantments.FIRE_ASPECT) == 0);
         ItemStack mace = SculkMaceItem.createStack(reg);
         check("Mace tier 0 has zero enchantments", !mace.hasEnchantments());
-        int[][] expectDensityWind = {{0, 0}, {1, 0}, {2, 0}, {2, 1}, {3, 1}, {3, 1}};
+        int[][] expectDensityWind = {{0, 0}, {1, 0}, {2, 0}, {0, 1}, {3, 0}, {0, 2}};
         for (int t = 1; t <= 5; t++) {
             SculkMaceItem.setTier(mace, t, reg);
             check("Mace tier " + t + ": Density " + expectDensityWind[t][0] + ", Wind Burst " + expectDensityWind[t][1],
@@ -283,6 +315,50 @@ final class SelfTest {
             dev.tuffsmp.shrinecraft.item.TuffArmorItem.createLeggings(reg), dev.tuffsmp.shrinecraft.item.TuffArmorItem.createBoots(reg))) {
             check(Registries.ITEM.getId(a.getItem()).getPath() + ": Protection 4, no Thorns", level(a, Enchantments.PROTECTION) == 4 && level(a, Enchantments.THORNS) == 0);
         }
+    }
+
+    private void testNoEnchanting() {
+        // every item the Shrine hands out must refuse the enchanting table (missing ENCHANTABLE component)
+        ItemStack[] every = {
+            new ItemStack(dev.tuffsmp.shrinecraft.registry.ModItems.MOLTEN_GREATAXE),
+            new ItemStack(dev.tuffsmp.shrinecraft.registry.ModItems.CUTLASS_OF_DOOM),
+            new ItemStack(dev.tuffsmp.shrinecraft.registry.ModItems.SCULK_MACE),
+            new ItemStack(dev.tuffsmp.shrinecraft.registry.ModItems.FROST_LONGBOW),
+            new ItemStack(dev.tuffsmp.shrinecraft.registry.ModItems.CLOUD_LANCE),
+            new ItemStack(dev.tuffsmp.shrinecraft.registry.ModItems.SCULK_CANNON),
+            new ItemStack(dev.tuffsmp.shrinecraft.registry.ModItems.HARBINGER_OF_DEATH),
+            new ItemStack(dev.tuffsmp.shrinecraft.registry.ModItems.ANAKLUSMOS),
+            new ItemStack(dev.tuffsmp.shrinecraft.registry.ModItems.SILVERS_SPAWN_ORB),
+            new ItemStack(dev.tuffsmp.shrinecraft.registry.ModItems.STRANGE_CAPE),
+            new ItemStack(dev.tuffsmp.shrinecraft.registry.ModItems.MAGIC_ESSENCE),
+            dev.tuffsmp.shrinecraft.item.TuffArmorItem.createHelmet(reg),
+            dev.tuffsmp.shrinecraft.item.TuffArmorItem.createChestplate(reg),
+            dev.tuffsmp.shrinecraft.item.TuffArmorItem.createLeggings(reg),
+            dev.tuffsmp.shrinecraft.item.TuffArmorItem.createBoots(reg),
+        };
+        for (ItemStack s : every) {
+            String id = Registries.ITEM.getId(s.getItem()).getPath();
+            check(id + " cannot be enchanted at the table (isEnchantable false)", !s.isEnchantable());
+        }
+        // the anvil mixin: an enchanted book must do NOTHING on a legendary ...
+        ItemStack book = new ItemStack(Items.ENCHANTED_BOOK);
+        EnchantmentHelper.apply(book, b -> b.set(Enchants.entry(reg, Enchantments.UNBREAKING), 3));
+        AnvilScreenHandler anvil = new AnvilScreenHandler(0, fake.getInventory());
+        anvil.getSlot(AnvilScreenHandler.INPUT_1_ID).setStack(new ItemStack(dev.tuffsmp.shrinecraft.registry.ModItems.CUTLASS_OF_DOOM));
+        anvil.getSlot(AnvilScreenHandler.INPUT_2_ID).setStack(book);
+        anvil.updateResult();
+        check("anvil: an enchanted book does nothing on the Cutlass (empty result, cost 0)", anvil.getSlot(AnvilScreenHandler.OUTPUT_ID).getStack().isEmpty() && anvil.getLevelCost() == 0);
+        // ... and a legendary put together with another legendary produces nothing either
+        anvil.getSlot(AnvilScreenHandler.INPUT_1_ID).setStack(new ItemStack(dev.tuffsmp.shrinecraft.registry.ModItems.SCULK_MACE));
+        anvil.getSlot(AnvilScreenHandler.INPUT_2_ID).setStack(new ItemStack(dev.tuffsmp.shrinecraft.registry.ModItems.SCULK_MACE));
+        anvil.updateResult();
+        check("anvil: two Sculk Maces cannot be combined", anvil.getSlot(AnvilScreenHandler.OUTPUT_ID).getStack().isEmpty() && anvil.getLevelCost() == 0);
+        // control: the same book still works on a plain vanilla netherite sword
+        AnvilScreenHandler vanilla = new AnvilScreenHandler(0, fake.getInventory());
+        vanilla.getSlot(AnvilScreenHandler.INPUT_1_ID).setStack(new ItemStack(Items.NETHERITE_SWORD));
+        vanilla.getSlot(AnvilScreenHandler.INPUT_2_ID).setStack(book);
+        vanilla.updateResult();
+        check("anvil control: the same book still works on a vanilla netherite sword", !vanilla.getSlot(AnvilScreenHandler.OUTPUT_ID).getStack().isEmpty() && vanilla.getLevelCost() > 0);
     }
 
     private void testData() {
@@ -640,6 +716,27 @@ final class SelfTest {
             }
         }
         check("an ACTIVE Cutlass in the off-hand / hotbar does not change a netherite sword's damage", Math.abs(withCutlassElsewhere - base1[2]) < 0.001F, "sword alone " + base1[2] + ", with surge elsewhere " + withCutlassElsewhere);
+        // the owner's report: "another weapon hit harder while the buff was on" - activate Doom Surge the REAL way (sneak + right-click
+        // with the Cutlass in hand), then SWITCH to a netherite sword and swing. The sword must deal exactly its baseline damage.
+        ItemStack cutHeld = CutlassOfDoomItem.createStack(reg);
+        fake.equipStack(EquipmentSlot.MAINHAND, cutHeld);
+        fake.setSneaking(true);
+        ActionResult armed = cutHeld.getItem().use(world, fake, Hand.MAIN_HAND);
+        fake.setSneaking(false);
+        check("Doom Surge armed for real (sneak + right-click)", armed == ActionResult.SUCCESS && CutlassOfDoomItem.isActive(cutHeld, world.getTime()));
+        fake.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.NETHERITE_SWORD));
+        float switched = 0;
+        for (int i = 0; i < 3; i++) {
+            fake.resetTicksSince();
+            pig.timeUntilRegen = 0;
+            float before = pig.getHealth();
+            fake.attack(pig);
+            switched = before - pig.getHealth();
+            if (Math.abs(switched - base1[i]) > 0.001F) {
+                break;
+            }
+        }
+        check("after arming Doom Surge and switching to another weapon, that weapon deals its normal damage", Math.abs(switched - base1[2]) < 0.001F, "sword alone " + base1[2] + ", after armed surge + switch " + switched);
         // the Cutlass itself in the main hand does get the 1.5x
         fake.equipStack(EquipmentSlot.OFFHAND, ItemStack.EMPTY);
         ItemStack cutMain = CutlassOfDoomItem.createStack(reg);
@@ -730,12 +827,12 @@ final class SelfTest {
         mace.getItem().postHit(mace, z, fake);
         SculkWaveManager.tickForTest(server, 20);
         float lost = 100.0F - z.getHealth();
-        check("a hit during Sculk Wave sends a shockwave: 6 hp of armor-ignoring damage (fully netherite-armored zombie)", Math.abs(lost - SculkMaceItem.WAVE_DAMAGE) < 0.01F, "lost " + lost + " hp");
-        // second wave in the same tick window still hurts (ignores invulnerability frames)
+        check("a hit during Sculk Wave blasts a radial shockwave: 6 hp of armor-ignoring damage (fully netherite-armored zombie)", Math.abs(lost - SculkMaceItem.WAVE_DAMAGE) < 0.01F, "lost " + lost + " hp");
+        // second blast in the same tick window still hurts (ignores invulnerability frames)
         mace.getItem().postHit(mace, z, fake);
         SculkWaveManager.tickForTest(server, 20);
-        check("the next hit's wave also lands immediately (no invulnerability window)", Math.abs((100.0F - z.getHealth()) - 2 * SculkMaceItem.WAVE_DAMAGE) < 0.01F, "total lost " + (100.0F - z.getHealth()));
-        check("the attacker is never hurt by their own wave", fake.getHealth() == fake.getMaxHealth());
+        check("the next hit's blast also lands immediately (no invulnerability window)", Math.abs((100.0F - z.getHealth()) - 2 * SculkMaceItem.WAVE_DAMAGE) < 0.01F, "total lost " + (100.0F - z.getHealth()));
+        check("the attacker is never hurt by their own blast", fake.getHealth() == fake.getMaxHealth());
         z.discard();
         fake.equipStack(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
     }

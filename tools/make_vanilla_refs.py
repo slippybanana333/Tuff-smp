@@ -19,7 +19,11 @@ from PIL import Image
 sys.path.insert(0, os.path.dirname(__file__))
 from common import *  # noqa
 
-JAR = glob.glob("/root/.gradle/caches/fabric-loom/*/minecraft-client.jar")[0]
+_JARS = glob.glob(os.path.expanduser("~/.gradle/caches/fabric-loom/*/minecraft-client.jar")) \
+    + glob.glob("/root/.gradle/caches/fabric-loom/*/minecraft-client.jar")
+if not _JARS:
+    sys.exit("no Minecraft client jar in the fabric-loom gradle cache - run a gradle build first")
+JAR = sorted(_JARS)[-1]
 OUT_M = os.path.join(REF_DIR, "vanilla_models")
 OUT_T = os.path.join(REF_DIR, "vanilla_items")
 # viewer name -> (model json in the jar, texture in the jar)

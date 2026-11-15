@@ -11,14 +11,15 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
 
-/** The player's "/gui" choice, saved in config/shrinecraft_gui.json so it survives restarts. Default = OFF (vanilla). */
+/**
+ * The player's "/gui" choice, saved in config/shrinecraft_gui.json so it survives restarts. Default = OFF (vanilla).
+ * There is no DYNAMIC (zone-following) any more - an old config saved with "dynamic" loads as OFF (vanilla).
+ */
 public final class GuiSettings {
     private GuiSettings() {}
 
-    public enum Mode { OFF, DYNAMIC, LOCKED }
+    public enum Mode { OFF, LOCKED }
 
     private static Mode mode = Mode.OFF;
     private static GuiTheme lockedTheme = GuiTheme.OCEAN;
@@ -41,11 +42,6 @@ public final class GuiSettings {
         save();
     }
 
-    public static void setDynamic() {
-        mode = Mode.DYNAMIC;
-        save();
-    }
-
     public static void setLocked(GuiTheme theme) {
         mode = Mode.LOCKED;
         lockedTheme = theme;
@@ -54,15 +50,7 @@ public final class GuiSettings {
 
     /** The theme to draw right now, or null for the vanilla background. This is called while drawing, so it must stay cheap. */
     public static GuiTheme currentTheme() {
-        switch (mode) {
-            case LOCKED:
-                return lockedTheme;
-            case DYNAMIC:
-                ClientPlayerEntity player = MinecraftClient.getInstance().player;
-                return player == null ? null : ZoneDetector.detectZone(player);
-            default:
-                return null;
-        }
+        return mode == Mode.LOCKED ? lockedTheme : null;
     }
 
     public static void load() {
@@ -78,8 +66,8 @@ public final class GuiSettings {
                 lockedTheme = t;
             }
             mode = switch (m) {
-                case "dynamic" -> Mode.DYNAMIC;
-                case "locked" -> Mode.LOCKED;
+                // "dynamic" (zone following) was removed - an old config falls back to the vanilla look
+                case "dynamic", "locked" -> m.equals("dynamic") ? Mode.OFF : Mode.LOCKED;
                 default -> Mode.OFF;
             };
         } catch (Exception e) {

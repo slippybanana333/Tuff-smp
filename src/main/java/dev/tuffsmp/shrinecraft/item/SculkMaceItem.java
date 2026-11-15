@@ -55,26 +55,25 @@ public class SculkMaceItem extends MaceItem {
     public static final int WAVE_COOLDOWN_SECONDS = 45;
     /** Damage dealt by each shockwave to everything it passes through, in hit points (6 = 3 hearts). Ignores armor. */
     public static final float WAVE_DAMAGE = 6.0F;
-    /** How far the shockwave travels, in blocks. */
-    public static final double WAVE_RANGE = 14.0;
-    /** How wide the shockwave is, in blocks (total width). */
-    public static final double WAVE_WIDTH = 3.0;
-    /** How fast the shockwave moves, in blocks per tick. */
+    /** Blast radius of each shockwave, in blocks from the thing you hit: EVERYTHING alive inside it takes the damage. */
+    public static final double WAVE_RADIUS = 4.0;
+    /** How fast the visible sculk ring expands outward, in blocks per tick (visual only; the damage is instant). */
     public static final double WAVE_SPEED = 1.0;
 
     /**
      * Enchantments that each tier applies. Index = tier. Each tier is the COMPLETE set for that tier: when the tier changes,
      * Density and Wind Burst are removed and the new set is applied (vanilla allows Density and Wind Burst together).
-     * Tier 3 adds Wind Burst on top of Density II; tier 4 raises Density to III; tier 5 keeps tier 4's set and unlocks the ability.
+     * Owner's ladder: tier 1 = Density I, tier 2 = Density II, tier 3 = Wind Burst I, tier 4 = Density III,
+     * tier 5 = Wind Burst II and unlocks the Sculk Wave ability.
      * Format: { enchantment, level }.
      */
     public static final Object[][][] TIER_ENCHANTS = {
         /* tier 0 */ {},
         /* tier 1 */ {{Enchantments.DENSITY, 1}},
         /* tier 2 */ {{Enchantments.DENSITY, 2}},
-        /* tier 3 */ {{Enchantments.DENSITY, 2}, {Enchantments.WIND_BURST, 1}},
-        /* tier 4 */ {{Enchantments.DENSITY, 3}, {Enchantments.WIND_BURST, 1}},
-        /* tier 5 */ {{Enchantments.DENSITY, 3}, {Enchantments.WIND_BURST, 1}},
+        /* tier 3 */ {{Enchantments.WIND_BURST, 1}},
+        /* tier 4 */ {{Enchantments.DENSITY, 3}},
+        /* tier 5 */ {{Enchantments.WIND_BURST, 2}},
     };
     // ===================================================================================
 
@@ -89,7 +88,8 @@ public class SculkMaceItem extends MaceItem {
             .component(DataComponentTypes.TOOL, MaceItem.createToolComponent())
             .repairable(net.minecraft.item.Items.BREEZE_ROD)
             .attributeModifiers(MaceItem.createAttributeModifiers())
-            .enchantable(15)
+            // NO .enchantable(): the legendaries can never be enchanted at the table / anvil.
+            // The tier ladder (Density / Wind Burst) is applied programmatically by setTier().
             .component(DataComponentTypes.WEAPON, new WeaponComponent(1))
             .component(DataComponentTypes.UNBREAKABLE, Unit.INSTANCE)
             .component(ModComponents.SCULK_TIER, 0);

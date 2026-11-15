@@ -11,7 +11,7 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.AxeItem;
+import net.minecraft.item.HoneycombItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
@@ -28,6 +28,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.Unit;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 /**
@@ -35,8 +36,12 @@ import net.minecraft.world.World;
  *
  * Ability "Lava Bomb": sneak + right-click arms it. The NEXT melee hit on a living thing within the
  * arming window drops a small cluster of temporary lava at the target's feet.
+ *
+ * NOTE: this is a plain Item that copies the vanilla Axe behaviour by hand (settings built from
+ * ToolMaterial.applyToolSettings below + the strip/scrape/wax useOnBlock). The vanilla AxeItem constructor runs
+ * settings.axe(...) which auto-adds .enchantable(15) - the legendaries must never be enchantable, so we cannot use it.
  */
-public class MoltenGreataxeItem extends AxeItem {
+public class MoltenGreataxeItem extends Item {
     // ======================= TWEAK ME (all numbers for this item) =======================
     /** How long Lava Bomb stays armed after sneak + right-click, in seconds. */
     public static final int ARM_DURATION_SECONDS = 10;
@@ -56,11 +61,19 @@ public class MoltenGreataxeItem extends AxeItem {
     // ===================================================================================
 
     public MoltenGreataxeItem(Item.Settings settings) {
-        super(ToolMaterial.NETHERITE, ATTACK_DAMAGE, ATTACK_SPEED, settings);
+        super(settings);
     }
 
     public static Item.Settings settings() {
-        return new Item.Settings().fireproof().rarity(Rarity.EPIC).component(DataComponentTypes.UNBREAKABLE, Unit.INSTANCE);
+        // same as the vanilla settings.axe(ToolMaterial.NETHERITE, ...) would build, minus the auto .enchantable(15)
+        return ToolMaterial.NETHERITE.applyToolSettings(
+                new Item.Settings()
+                    .fireproof()
+                    .rarity(Rarity.EPIC)
+                    .component(DataComponentTypes.UNBREAKABLE, Unit.INSTANCE),
+                net.minecraft.registry.tag.BlockTags.AXE_MINEABLE, ATTACK_DAMAGE, ATTACK_SPEED, 5.0F)
+            // strip the ENCHANTABLE component that applyToolSettings' base settings just added
+            .component(DataComponentTypes.ENCHANTABLE, null);
     }
 
     /** The fully enchanted stack the Shrine hands out. */
@@ -81,7 +94,74 @@ public class MoltenGreataxeItem extends AxeItem {
         if (player != null && player.isSneaking()) {
             return ActionResult.PASS;
         }
-        return super.useOnBlock(context);
+        // the vanilla AxeItem.useOnBlock (strip / scrape copper / wax off), copied because this item is not an AxeItem
+        World world = context.getWorld();
+        BlockPos blockPos = context.getBlockPos();
+        java.util.Optional<net.minecraft.block.BlockState> stripped = shrinecraft$tryStrip(world, blockPos, player, world.getBlockState(blockPos));
+        if (stripped.isEmpty()) {
+            return ActionResult.PASS;
+        }
+        ItemStack stack = context.getStack();
+        if (player instanceof ServerPlayerEntity serverPlayer) {
+            net.minecraft.advancement.criterion.Criteria.ITEM_USED_ON_BLOCK.trigger(serverPlayer, blockPos, stack);
+        }
+        world.setBlockState(blockPos, stripped.get(), net.minecraft.block.Block.NOTIFY_ALL_AND_REDRAW);
+        world.emitGameEvent(net.minecraft.world.event.GameEvent.BLOCK_CHANGE, blockPos, net.minecraft.world.event.GameEvent.Emitter.of(player, stripped.get()));
+        return ActionResult.SUCCESS;
+    }
+
+    /** The vanilla AxeItem strip/scrape/wax-off logic (this item is not an AxeItem any more - see the class note). */
+    private static java.util.Optional<net.minecraft.block.BlockState> shrinecraft$tryStrip(
+        World world, BlockPos pos, PlayerEntity player, net.minecraft.block.BlockState state) {
+        java.util.Optional<net.minecraft.block.BlockState> stripped = STRIPPED_BLOCKS.containsKey(state.getBlock())
+            ? java.util.Optional.of(STRIPPED_BLOCKS.get(state.getBlock()).getDefaultState()
+                .with(net.minecraft.block.PillarBlock.AXIS, state.get(net.minecraft.block.PillarBlock.AXIS)))
+            : java.util.Optional.empty();
+        if (stripped.isPresent()) {
+            world.playSound(player, pos, SoundEvents.ITEM_AXE_STRIP, SoundCategory.BLOCKS, 1.0F, 1.0F);
+            return stripped;
+        }
+        java.util.Optional<net.minecraft.block.BlockState> scraped = net.minecraft.block.Oxidizable.getDecreasedOxidationState(state);
+        if (scraped.isPresent()) {
+            world.playSound(player, pos, SoundEvents.ITEM_AXE_SCRAPE, SoundCategory.BLOCKS, 1.0F, 1.0F);
+            world.syncWorldEvent(player, 3005, pos, 0);
+            return scraped;
+        }
+        net.minecraft.block.Block unwaxed = net.minecraft.item.HoneycombItem.WAXED_TO_UNWAXED_BLOCKS.get().get(state.getBlock());
+        if (unwaxed != null) {
+            world.playSound(player, pos, SoundEvents.ITEM_AXE_WAX_OFF, SoundCategory.BLOCKS, 1.0F, 1.0F);
+            world.syncWorldEvent(player, 3004, pos, 0);
+            return java.util.Optional.of(unwaxed.getStateWithProperties(state));
+        }
+        return java.util.Optional.empty();
+    }
+
+    /** The vanilla AxeItem log -> stripped-log map (copied; this item is not an AxeItem - see the class note). */
+    private static final java.util.Map<net.minecraft.block.Block, net.minecraft.block.Block> STRIPPED_BLOCKS = new java.util.HashMap<>();
+    static {
+        STRIPPED_BLOCKS.put(net.minecraft.block.Blocks.OAK_WOOD, net.minecraft.block.Blocks.STRIPPED_OAK_WOOD);
+        STRIPPED_BLOCKS.put(net.minecraft.block.Blocks.OAK_LOG, net.minecraft.block.Blocks.STRIPPED_OAK_LOG);
+        STRIPPED_BLOCKS.put(net.minecraft.block.Blocks.DARK_OAK_WOOD, net.minecraft.block.Blocks.STRIPPED_DARK_OAK_WOOD);
+        STRIPPED_BLOCKS.put(net.minecraft.block.Blocks.DARK_OAK_LOG, net.minecraft.block.Blocks.STRIPPED_DARK_OAK_LOG);
+        STRIPPED_BLOCKS.put(net.minecraft.block.Blocks.PALE_OAK_WOOD, net.minecraft.block.Blocks.STRIPPED_PALE_OAK_WOOD);
+        STRIPPED_BLOCKS.put(net.minecraft.block.Blocks.PALE_OAK_LOG, net.minecraft.block.Blocks.STRIPPED_PALE_OAK_LOG);
+        STRIPPED_BLOCKS.put(net.minecraft.block.Blocks.ACACIA_WOOD, net.minecraft.block.Blocks.STRIPPED_ACACIA_WOOD);
+        STRIPPED_BLOCKS.put(net.minecraft.block.Blocks.ACACIA_LOG, net.minecraft.block.Blocks.STRIPPED_ACACIA_LOG);
+        STRIPPED_BLOCKS.put(net.minecraft.block.Blocks.CHERRY_WOOD, net.minecraft.block.Blocks.STRIPPED_CHERRY_WOOD);
+        STRIPPED_BLOCKS.put(net.minecraft.block.Blocks.CHERRY_LOG, net.minecraft.block.Blocks.STRIPPED_CHERRY_LOG);
+        STRIPPED_BLOCKS.put(net.minecraft.block.Blocks.BIRCH_WOOD, net.minecraft.block.Blocks.STRIPPED_BIRCH_WOOD);
+        STRIPPED_BLOCKS.put(net.minecraft.block.Blocks.BIRCH_LOG, net.minecraft.block.Blocks.STRIPPED_BIRCH_LOG);
+        STRIPPED_BLOCKS.put(net.minecraft.block.Blocks.JUNGLE_WOOD, net.minecraft.block.Blocks.STRIPPED_JUNGLE_WOOD);
+        STRIPPED_BLOCKS.put(net.minecraft.block.Blocks.JUNGLE_LOG, net.minecraft.block.Blocks.STRIPPED_JUNGLE_LOG);
+        STRIPPED_BLOCKS.put(net.minecraft.block.Blocks.SPRUCE_WOOD, net.minecraft.block.Blocks.STRIPPED_SPRUCE_WOOD);
+        STRIPPED_BLOCKS.put(net.minecraft.block.Blocks.SPRUCE_LOG, net.minecraft.block.Blocks.STRIPPED_SPRUCE_LOG);
+        STRIPPED_BLOCKS.put(net.minecraft.block.Blocks.WARPED_STEM, net.minecraft.block.Blocks.STRIPPED_WARPED_STEM);
+        STRIPPED_BLOCKS.put(net.minecraft.block.Blocks.WARPED_HYPHAE, net.minecraft.block.Blocks.STRIPPED_WARPED_HYPHAE);
+        STRIPPED_BLOCKS.put(net.minecraft.block.Blocks.CRIMSON_STEM, net.minecraft.block.Blocks.STRIPPED_CRIMSON_STEM);
+        STRIPPED_BLOCKS.put(net.minecraft.block.Blocks.CRIMSON_HYPHAE, net.minecraft.block.Blocks.STRIPPED_CRIMSON_HYPHAE);
+        STRIPPED_BLOCKS.put(net.minecraft.block.Blocks.MANGROVE_WOOD, net.minecraft.block.Blocks.STRIPPED_MANGROVE_WOOD);
+        STRIPPED_BLOCKS.put(net.minecraft.block.Blocks.MANGROVE_LOG, net.minecraft.block.Blocks.STRIPPED_MANGROVE_LOG);
+        STRIPPED_BLOCKS.put(net.minecraft.block.Blocks.BAMBOO_BLOCK, net.minecraft.block.Blocks.STRIPPED_BAMBOO_BLOCK);
     }
 
     @Override

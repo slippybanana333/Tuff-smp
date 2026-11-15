@@ -43,6 +43,9 @@ public class HarbingerOfDeathItem extends Item {
     public static Item.Settings settings() {
         return new Item.Settings()
             .pickaxe(ToolMaterial.NETHERITE, ATTACK_DAMAGE, ATTACK_SPEED)
+            // .pickaxe() auto-adds .enchantable(material.enchantmentValue()) - strip it again: the legendaries
+            // can never be enchanted at the table / anvil (Efficiency/Fortune/... are written by createStack()).
+            .component(DataComponentTypes.ENCHANTABLE, null)
             .fireproof()
             .rarity(Rarity.EPIC)
             .component(DataComponentTypes.UNBREAKABLE, Unit.INSTANCE)

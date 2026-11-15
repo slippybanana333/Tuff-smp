@@ -58,6 +58,9 @@ public class CloudLanceItem extends Item {
     public static Item.Settings settings() {
         return new Item.Settings()
             .spear(ToolMaterial.NETHERITE, 1.15F, 1.2F, 0.4F, 2.5F, 7.0F, 5.5F, 5.1F, 8.75F, 4.6F)
+            // .spear() auto-adds .enchantable(material.enchantmentValue()) - strip it again: the legendaries
+            // can never be enchanted at the table / anvil.
+            .component(DataComponentTypes.ENCHANTABLE, null)
             .fireproof()
             .rarity(Rarity.EPIC)
             .component(DataComponentTypes.UNBREAKABLE, Unit.INSTANCE)

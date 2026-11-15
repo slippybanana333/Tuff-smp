@@ -62,6 +62,9 @@ public class TuffArmorItem extends Item {
     private static Item.Settings settings(RegistryKey<EquipmentAsset> asset, EquipmentType type) {
         return new Item.Settings()
             .armor(material(asset), type)
+            // .armor() auto-adds .enchantable(material.enchantmentValue()) - strip it again: the legendaries
+            // can never be enchanted at the table / anvil (Protection 4 is written by the create*() stacks).
+            .component(DataComponentTypes.ENCHANTABLE, null)
             .fireproof()
             .rarity(Rarity.EPIC)
             .component(DataComponentTypes.UNBREAKABLE, Unit.INSTANCE);

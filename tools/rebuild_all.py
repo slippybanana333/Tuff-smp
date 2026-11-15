@@ -29,7 +29,8 @@ def main():
     run(py, os.path.join(T, "check_models.py"))
     run(py, os.path.join(T, "build_resourcepack.py"))
     if "--jar" in sys.argv:
-        run("./gradlew", "build")
+        gradlew = os.path.join(ROOT, "gradlew.bat" if os.name == "nt" else "./gradlew")
+        run(gradlew, "build")
     if "--viewer" in sys.argv:                  # the old model viewer / Blockbench export are optional extras now
         run(py, os.path.join(T, "export_bbmodel.py"))
         run(py, os.path.join(T, "build_viewer.py"))

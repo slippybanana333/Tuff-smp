@@ -2,14 +2,14 @@
   "anaklusmos": {
     "thirdperson_righthand": {
       "rotation": [
-        9.0,
-        90.0,
-        0.0
+        0,
+        -90,
+        55
       ],
       "translation": [
         0.0,
-        -3.03,
-        1.49
+        -2.706,
+        2.253
       ],
       "scale": [
         1.15,
@@ -21,13 +21,13 @@
   "cloud_lance": {
     "firstperson_righthand": {
       "rotation": [
-        41.84,
+        18.0,
         75.68,
         -74.3
       ],
       "translation": [
         -0.4,
-        5.6,
+        3.0,
         1.4
       ],
       "scale": [
@@ -38,14 +38,14 @@
     },
     "thirdperson_righthand": {
       "rotation": [
-        7.0,
-        90.0,
-        0.0
+        5,
+        270,
+        -40
       ],
       "translation": [
         0.0,
-        -0.7,
-        1.58
+        -0.501,
+        1.172
       ],
       "scale": [
         0.96,
@@ -87,6 +87,23 @@
         0.8,
         1.05,
         0.8
+      ]
+    },
+    "gui": {
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "translation": [
+        -0.74,
+        -2.09,
+        0.0
+      ],
+      "scale": [
+        0.559,
+        0.559,
+        0.559
       ]
     }
   },
@@ -326,14 +343,14 @@
     },
     "thirdperson_righthand": {
       "rotation": [
-        177.57,
-        -6.41,
-        172.31
+        -90,
+        0,
+        -60
       ],
       "translation": [
-        -0.4,
-        5.3,
-        3.9
+        6.387,
+        -3.506,
+        -1.944
       ],
       "scale": [
         1.0,
