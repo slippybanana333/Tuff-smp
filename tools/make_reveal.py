@@ -3,7 +3,7 @@
 make_reveal.py - makes the "recipe reveal" clip for one legendary: a glowing crafting table, the ingredients drop onto the grid, flash, the real
 3D item appears over the table and its name drops in as a pixel title (remake of the owner's reference clip).
 
-    python3 tools/make_reveal.py sculk_mace                       # -> build/reveal/sculk_mace_reveal.mp4 (1280x720, 60 fps, ~6.4 s)
+    python3 tools/make_reveal.py sculk_mace                       # -> build/reveal/sculk_mace_reveal.mp4 (1280x720, 60 fps, 10 s)
     python3 tools/make_reveal.py sculk_mace --preview 0.9,2.5,4.5 # only render those moments as PNGs (fast way to check a change)
     python3 tools/make_reveal.py sculk_mace --size 1920x1080 --fps 30
 
@@ -35,24 +35,25 @@ JARS = glob.glob("/root/.gradle/caches/fabric-loom/*/minecraft-client.jar")
 
 # ------------------------------------------------------------------ the clip (seconds). Matches the reference: wide shot -> push in, items drop, hold,
 # flash + item appears, title drops, hold, fade.
+AFTER_SLOW = 2.2          # everything AFTER the craft (shine, item appearing, title, hold) runs this many times slower than the drop-in part
 TIMELINE = {
     "itemsStart": 0.75, "stagger": 0.1, "fall": 0.7,
-    "reveal": 3.15, "converge": 0.4, "legendIn": 0.75,
-    "title": 3.85, "letterStagger": 0.07, "letterTime": 0.32,
-    "fadeIn": 0.4, "fadeOut": 0.5,
-    # wide + low opening, then the camera rises and pushes in close (the Shrine + the item above it fill the frame)
-    "camDist": [[0, 6.6], [1.5, 4.8], [3.15, 3.95], [6.4, 3.65]],
-    "camPitch": [[0, 10], [1.5, 17], [3.15, 20], [6.4, 21]],
-    "camYaw": [[0, -42], [3.15, -30], [6.4, -22]],
-    "camTargetY": [[0, 0.8], [1.5, 1.2], [3.15, 1.62], [6.4, 1.6]],
+    "reveal": 3.15, "converge": 0.4, "legendIn": round(0.75 * AFTER_SLOW, 2),
+    "title": round(3.55 + 0.3 * AFTER_SLOW, 2), "letterStagger": 0.15, "letterTime": 0.7,
+    "fadeIn": 0.4, "fadeOut": 0.9,
+    # wide + low opening, then the camera rises and pushes in close (the Shrine + the item above it fill the frame); after the craft it keeps drifting in slowly
+    "camDist": [[0, 6.6], [1.5, 4.9], [3.15, 3.95], [10.0, 3.45]],
+    "camPitch": [[0, 10], [1.5, 17], [3.15, 20], [10.0, 22]],
+    "camYaw": [[0, -42], [3.15, -30], [10.0, -17]],
+    "camTargetY": [[0, 0.8], [1.5, 1.2], [3.15, 1.62], [10.0, 1.55]],
 }
-DURATION = 6.4
+DURATION = 10.0
 
 # per-legendary look: title gradient (left, middle, right), glow / spark colours, how the item lies on the table
 ITEM_LOOK = {
     "default": dict(titleColors=[[120, 255, 232], [70, 195, 255], [175, 135, 255]], accent=[0.4, 0.95, 1.0], accentLight=0x4FF0FF,
                     legendaryGlow=["rgba(120,255,240,0.9)", "rgba(40,160,200,0.35)"], legendaryEmissive=0x061A20, flashColor="150,255,248",
-                    legendaryLength=1.4, legendaryHover=2.02, legendarySpin=0.45),
+                    legendaryLength=1.4, legendaryHover=2.02, legendarySpin=0.25),
 }
 # everything tinted for the item (the reference was orange for its crafting table; the owner asked for sculk teal here)
 THEME = {
@@ -198,7 +199,7 @@ def main():
     theme = THEME[a.theme]
     config = dict(width=w, height=h, fps=a.fps, duration=DURATION, fov=38, title=title, timeline=TIMELINE, theme=theme,
                   titleScreenWidth=0.72, titleScreenY=0.8, titleDepth=1.2, bloom=theme["bloom"], vignette=theme["vignette"], floorRepeat=60,
-                  ringRadius=0.74, ringY=1.72, ringSpeed=0.42, itemSize=0.44, **look)
+                  ringRadius=0.74, ringY=1.72, ringSpeed=0.42, itemSize=0.44, afterSlow=AFTER_SLOW, **look)
     if a.bloom is not None:
         config["bloom"] = a.bloom
     if a.debug_cam:

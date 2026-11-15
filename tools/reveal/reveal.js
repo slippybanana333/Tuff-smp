@@ -11,6 +11,7 @@
 (function () {
   'use strict';
   const R = window.REVEAL, C = R.config, T = C.timeline, TH = C.theme;
+  const SLOW = C.afterSlow || 1;                                   // after the craft everything runs this much slower
   const W = C.width, H = C.height, DEG = Math.PI / 180;
 
   // ---------------------------------------------------------------- small helpers
@@ -301,7 +302,7 @@
     // 4) burst out of the crystal when the item appears
     cl = clouds.burst; const tb = T.reveal + T.converge;
     for (let i = 0; i < cl.n; i++) {
-      const s = cl.seeds[i], age = t - tb;
+      const s = cl.seeds[i], age = (t - tb) / SLOW;
       if (age < 0 || age > 2.2) { setPoint(cl, i, 0, -9, 0, 0, 0, 0, 0); continue; }
       const th = s.a * Math.PI * 2, ph = Math.acos(2 * s.b - 1), sp = 0.8 + s.c * 2.4, drag = 1 - Math.exp(-age * 2.2);
       const dx = Math.sin(ph) * Math.cos(th), dy = Math.cos(ph) * 0.9 + 0.35, dz = Math.sin(ph) * Math.sin(th), k = age / 2.2;
@@ -311,7 +312,7 @@
     // 5) spores orbiting the item afterwards
     cl = clouds.spores;
     for (let i = 0; i < cl.n; i++) {
-      const s = cl.seeds[i], tt = t - (tb + 0.2);
+      const s = cl.seeds[i], tt = (t - (tb + 0.2 * SLOW)) / SLOW;
       if (tt < 0) { setPoint(cl, i, 0, -9, 0, 0, 0, 0, 0); continue; }
       const life = 3.2, age = (tt * 0.5 + s.a * life) % life, k = age / life, ang = s.b * 6.28 + age * 0.5, rad = 0.35 + s.c * 0.6;
       setPoint(cl, i, Math.cos(ang) * rad, CRYSTAL_TOP + 0.1 + age * 0.55, Math.sin(ang) * rad, acc[0], acc[1], acc[2], Math.sin(Math.PI * k) * 0.8 * smooth(0, 0.8, tt));
@@ -398,7 +399,7 @@
     placeCamera(t);
     const pulse = 0.5 + 0.5 * Math.sin(t * 2.4);
     keyLight.intensity = TH.keyI + 0.12 * pulse;
-    crystalLight.intensity = 1.1 + 0.25 * pulse + 0.6 * smooth(tReveal() - 0.3, tReveal(), t) * (1 - smooth(tReveal() + 0.1, tReveal() + 0.8, t));
+    crystalLight.intensity = 1.1 + 0.25 * pulse + 0.6 * smooth(tReveal() - 0.3, tReveal(), t) * (1 - smooth(tReveal() + 0.1 * SLOW, tReveal() + 0.8 * SLOW, t));
     crystalGlowMat.opacity = 0.5 + 0.2 * pulse;
     floorGlow.material.opacity = 0.85 + 0.15 * pulse; floorGlow.scale.setScalar(1 + 0.03 * pulse);
     // reflection ripples strongly in the wide opening, then calms down as the camera rises
@@ -441,13 +442,13 @@
     legendGlow.visible = legend.visible; legendGlow.position.set(0, hover, 0);
     legendGlowMat.opacity = clamp(lp * 1.2) * (0.14 + 0.06 * Math.sin(t * 2.0)) * (t > tb ? 1 : 0);
     // quick shine (instead of a full white flash): flare at the crystal + a short light burst
-    const sa = t - (tb - 0.04), sk = sa < 0 ? 0 : clamp(sa / 0.6);
-    shine.visible = sa > 0 && sa < 0.62; shine.position.set(0, CRYSTAL_TOP, 0);
+    const sa = t - (tb - 0.04), sk = sa < 0 ? 0 : clamp(sa / (0.6 * SLOW));
+    shine.visible = sa > 0 && sa < 0.62 * SLOW; shine.position.set(0, CRYSTAL_TOP, 0);
     shine.scale.setScalar(0.5 + 3.4 * easeOutCubic(sk)); shineMat.opacity = (1 - smooth(0.12, 1.0, sk)) * 0.95;
-    const flashK = sa < 0 ? 0 : Math.exp(-sa / 0.12);
-    revealLight.intensity = t < tb - 0.05 ? 0 : (0.4 + 4.0 * flashK + 0.08 * Math.sin(t * 2.2)) * smooth(tb - 0.05, tb + 0.15, t);
+    const flashK = sa < 0 ? 0 : Math.exp(-sa / (0.12 * SLOW));
+    revealLight.intensity = t < tb - 0.05 ? 0 : (0.4 + 4.0 * flashK + 0.08 * Math.sin(t * 2.2)) * smooth(tb - 0.05, tb + 0.15 * SLOW, t);
 
-    legendLight.intensity = 0.9 * smooth(tb, tb + 0.5, t);
+    legendLight.intensity = 0.9 * smooth(tb, tb + 0.5 * SLOW, t);
     updateParticles(t, itemPos);
 
     // title billboard: screen-anchored at the top, constant size, at a depth BEHIND the Shrine so it (and the item) can cover part of it
