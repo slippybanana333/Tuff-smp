@@ -27,3 +27,7 @@ tools/reference/inventory.png
 tools/reference/polished_tuff.png
 tools/reference/tuff_bricks.png
 tools/reference/armor_picture.png
+
+# recipe-reveal generator: cache + generated data embed Mojang textures - never commit
+tools/reveal/.cache/
+tools/reveal/reveal_data.js
