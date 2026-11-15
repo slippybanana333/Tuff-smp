@@ -41,6 +41,8 @@ TIMELINE = {
     "reveal": 3.15, "converge": 0.4, "legendIn": round(0.75 * AFTER_SLOW, 2),
     "title": round(3.55 + 0.3 * AFTER_SLOW, 2), "letterStagger": 0.15, "letterTime": 0.7,
     "fadeIn": 0.4, "fadeOut": 0.9,
+    # the item pops in showing its SIDE view (broad profile facing the camera), holds, then turns 90 degrees to its END view and stays there
+    "turnStart": round(3.55 + 0.85 * AFTER_SLOW, 2), "turnTime": round(0.7 * AFTER_SLOW, 2),
     # wide + low opening, then the camera rises and pushes in close (the Shrine + the item above it fill the frame); after the craft it keeps drifting in slowly
     "camDist": [[0, 6.6], [1.5, 4.9], [3.15, 3.95], [10.0, 3.45]],
     "camPitch": [[0, 10], [1.5, 17], [3.15, 20], [10.0, 22]],

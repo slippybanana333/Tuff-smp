@@ -383,14 +383,14 @@
   }
 
   // ---------------------------------------------------------------- camera
-  const camState = { d: 5 };
+  const camState = { d: 5, yaw: 0 };
   function placeCamera(t) {
     const dbg = C.debugCam;
     const d = dbg ? dbg[0] : keys(t, T.camDist), pitch = (dbg ? dbg[1] : keys(t, T.camPitch)) * DEG, yaw = (dbg ? dbg[2] : keys(t, T.camYaw)) * DEG;
     const ty = dbg && dbg[3] !== undefined ? dbg[3] : keys(t, T.camTargetY);
     const shake = 0.0025 * Math.sin(t * 37) + 0.0015 * Math.sin(t * 53 + 1);
     camera.position.set(d * Math.cos(pitch) * Math.sin(yaw) + shake, ty + d * Math.sin(pitch) + shake, d * Math.cos(pitch) * Math.cos(yaw));
-    camera.lookAt(0, ty, 0); camera.updateMatrixWorld(); camState.d = d;
+    camera.lookAt(0, ty, 0); camera.updateMatrixWorld(); camState.d = d; camState.yaw = yaw;
   }
 
   // ---------------------------------------------------------------- one frame
@@ -437,7 +437,9 @@
     if (legend.visible) {
       legend.position.set(0, hover + Math.sin(t * 1.5) * 0.03 - (1 - easeOutCubic(lp)) * 0.7, 0);
       legend.scale.setScalar(Math.max(0.0001, easeOutBack(lp)));
-      legend.rotation.set(Math.sin(t * 1.1) * 0.03, C.legendarySpin * after + (1 - easeOutCubic(lp)) * 7.0 + 0.5, Math.sin(t * 0.9) * 0.025);
+      // SIDE view first (the broad profile - head and both bosses - faces the camera), then it turns 90 degrees to the END view and stays
+      const turn = clamp((t - T.turnStart) / T.turnTime), turnE = turn < 0.5 ? 4 * turn * turn * turn : 1 - Math.pow(-2 * turn + 2, 3) / 2;
+      legend.rotation.set(Math.sin(t * 1.1) * 0.03, camState.yaw + turnE * Math.PI / 2 + Math.sin(t * 0.8) * 0.04, Math.sin(t * 0.9) * 0.025);
     }
     legendGlow.visible = legend.visible; legendGlow.position.set(0, hover, 0);
     legendGlowMat.opacity = clamp(lp * 1.2) * (0.14 + 0.06 * Math.sin(t * 2.0)) * (t > tb ? 1 : 0);
