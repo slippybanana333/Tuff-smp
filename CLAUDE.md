@@ -97,7 +97,7 @@ python3 tools/check_models.py           # proportions + vanilla limits + grip al
 python3 tools/build_resourcepack.py     # only the resource pack -> build/TuffSMP-ResourcePack.zip
 ./gradlew build                         # the mod jar -> build/libs/tuff-smp-1.0.0.jar
 bash tools/server_selftest.sh           # boots a HEADLESS server and runs /tuffsmp selftest (235 checks on the item logic, incl. REAL bow shots: release -> arrow flight -> hit on a Prot 4 diamond zombie and player)
-python3 tools/make_reveal.py sculk_mace  # "recipe reveal" clip for one legendary (table + ingredients drop in, flash, the 3D item appears, pixel title) -> build/reveal/<item>_reveal.mp4 (add --preview 1.2,3.5 for single PNG frames, --size 1920x1080, --fps 30)
+python3 tools/make_reveal.py sculk_mace  # "recipe reveal" clip for one legendary (Shrine + one of each ingredient orbiting, quick shine, the 3D item appears upright, pixel title) -> build/reveal/<item>_reveal.mp4 (add --preview 1.2,3.5 for single PNG frames, --size 1920x1080, --fps 30)
 ./gradlew runClientGameTest             # REAL game client under a virtual display: in-game screenshots (needs Xvfb, see below)
 ```
 Client test needs a virtual display + software OpenGL:
