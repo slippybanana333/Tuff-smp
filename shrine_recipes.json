@@ -1,0 +1,457 @@
+{
+  "version": 3,
+  "_help": "Edit ingredients here, then run /tuffsmp reload (or restart). \u0027item\u0027 is an item id like minecraft:diamond. An empty ingredients list \u003d recipe not set up yet (cannot be crafted). Set placeholder to false once a recipe is final. You can edit name/ingredients/placeholder but not the ids.",
+  "recipes": [
+    {
+      "id": "molten_greataxe",
+      "name": "Molten Greataxe",
+      "placeholder": false,
+      "ingredients": [
+        {
+          "item": "minecraft:diamond_axe",
+          "count": 1
+        },
+        {
+          "item": "minecraft:ghast_tear",
+          "count": 64
+        },
+        {
+          "item": "minecraft:magma_cream",
+          "count": 64
+        },
+        {
+          "item": "minecraft:fire_charge",
+          "count": 16
+        },
+        {
+          "item": "minecraft:netherrack",
+          "count": 64
+        },
+        {
+          "item": "minecraft:magma_block",
+          "count": 64
+        },
+        {
+          "item": "minecraft:blaze_rod",
+          "count": 64
+        },
+        {
+          "item": "shrinecraft:magic_essence",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "cutlass_of_doom",
+      "name": "Cutlass of Doom",
+      "placeholder": false,
+      "ingredients": [
+        {
+          "item": "minecraft:diamond_sword",
+          "count": 1
+        },
+        {
+          "item": "minecraft:conduit",
+          "count": 3
+        },
+        {
+          "item": "minecraft:trident",
+          "count": 1
+        },
+        {
+          "item": "minecraft:prismarine_crystals",
+          "count": 64
+        },
+        {
+          "item": "minecraft:prismarine_shard",
+          "count": 64
+        },
+        {
+          "item": "minecraft:nautilus_shell",
+          "count": 10
+        },
+        {
+          "item": "shrinecraft:magic_essence",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "sculk_mace",
+      "name": "Sculk Mace",
+      "placeholder": false,
+      "ingredients": [
+        {
+          "item": "minecraft:heavy_core",
+          "count": 1
+        },
+        {
+          "item": "minecraft:echo_shard",
+          "count": 16
+        },
+        {
+          "item": "minecraft:sculk_catalyst",
+          "count": 64
+        },
+        {
+          "item": "minecraft:sculk_sensor",
+          "count": 32
+        },
+        {
+          "item": "minecraft:sculk_shrieker",
+          "count": 16
+        },
+        {
+          "item": "minecraft:music_disc_5",
+          "count": 1
+        },
+        {
+          "item": "shrinecraft:magic_essence",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "frost_longbow",
+      "name": "Frost Longbow",
+      "placeholder": false,
+      "ingredients": [
+        {
+          "item": "minecraft:bow",
+          "count": 1
+        },
+        {
+          "item": "minecraft:ice",
+          "count": 64
+        },
+        {
+          "item": "minecraft:packed_ice",
+          "count": 128
+        },
+        {
+          "item": "minecraft:blue_ice",
+          "count": 256
+        },
+        {
+          "item": "minecraft:diamond",
+          "count": 64
+        },
+        {
+          "item": "shrinecraft:magic_essence",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "cloud_lance",
+      "name": "Cloud Lance",
+      "placeholder": false,
+      "ingredients": [
+        {
+          "item": "minecraft:diamond_spear",
+          "count": 1
+        },
+        {
+          "item": "minecraft:breeze_rod",
+          "count": 64
+        },
+        {
+          "item": "minecraft:feather",
+          "count": 32
+        },
+        {
+          "item": "minecraft:ghast_tear",
+          "count": 16
+        },
+        {
+          "item": "shrinecraft:magic_essence",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "shrine_helmet",
+      "name": "Shrine Helmet",
+      "placeholder": false,
+      "ingredients": [
+        {
+          "item": "minecraft:diamond_helmet",
+          "count": 1
+        },
+        {
+          "item": "minecraft:tuff",
+          "count": 64
+        },
+        {
+          "item": "minecraft:glass_bottle",
+          "count": 64
+        },
+        {
+          "item": "minecraft:glowstone",
+          "count": 64
+        },
+        {
+          "item": "minecraft:nether_wart",
+          "count": 64
+        },
+        {
+          "item": "minecraft:blaze_powder",
+          "count": 32
+        },
+        {
+          "item": "minecraft:magma_cream",
+          "count": 16
+        },
+        {
+          "item": "shrinecraft:magic_essence",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "shrine_chestplate",
+      "name": "Shrine Chestplate",
+      "placeholder": false,
+      "ingredients": [
+        {
+          "item": "minecraft:diamond_chestplate",
+          "count": 1
+        },
+        {
+          "item": "minecraft:tuff",
+          "count": 64
+        },
+        {
+          "item": "minecraft:diamond",
+          "count": 32
+        },
+        {
+          "item": "minecraft:emerald_block",
+          "count": 256
+        },
+        {
+          "item": "minecraft:amethyst_shard",
+          "count": 32
+        },
+        {
+          "item": "shrinecraft:magic_essence",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "shrine_leggings",
+      "name": "Shrine Leggings",
+      "placeholder": false,
+      "ingredients": [
+        {
+          "item": "minecraft:diamond_leggings",
+          "count": 1
+        },
+        {
+          "item": "minecraft:tuff",
+          "count": 64
+        },
+        {
+          "item": "minecraft:prismarine_crystals",
+          "count": 32
+        },
+        {
+          "item": "minecraft:nautilus_shell",
+          "count": 16
+        },
+        {
+          "item": "minecraft:conduit",
+          "count": 1
+        },
+        {
+          "item": "shrinecraft:magic_essence",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "shrine_boots",
+      "name": "Shrine Boots",
+      "placeholder": false,
+      "ingredients": [
+        {
+          "item": "minecraft:diamond_boots",
+          "count": 1
+        },
+        {
+          "item": "minecraft:tuff",
+          "count": 64
+        },
+        {
+          "item": "minecraft:sugar",
+          "count": 64
+        },
+        {
+          "item": "minecraft:rabbit_foot",
+          "count": 8
+        },
+        {
+          "item": "minecraft:feather",
+          "count": 16
+        },
+        {
+          "item": "shrinecraft:magic_essence",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "harbinger_of_death",
+      "name": "Harbinger of Death",
+      "placeholder": false,
+      "ingredients": [
+        {
+          "item": "minecraft:diamond_pickaxe",
+          "count": 1
+        },
+        {
+          "item": "minecraft:lapis_lazuli",
+          "count": 64
+        },
+        {
+          "item": "minecraft:redstone",
+          "count": 64
+        },
+        {
+          "item": "minecraft:gold_ingot",
+          "count": 64
+        },
+        {
+          "item": "minecraft:diamond",
+          "count": 64
+        },
+        {
+          "item": "minecraft:copper_ingot",
+          "count": 64
+        },
+        {
+          "item": "minecraft:coal",
+          "count": 64
+        },
+        {
+          "item": "minecraft:iron_ingot",
+          "count": 64
+        },
+        {
+          "item": "shrinecraft:magic_essence",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "anaklusmos",
+      "name": "Anaklusmos",
+      "placeholder": false,
+      "ingredients": [
+        {
+          "item": "minecraft:trident",
+          "count": 1
+        },
+        {
+          "item": "minecraft:conduit",
+          "count": 1
+        },
+        {
+          "item": "minecraft:prismarine_shard",
+          "count": 64
+        },
+        {
+          "item": "minecraft:gold_block",
+          "count": 32
+        },
+        {
+          "item": "minecraft:nautilus_shell",
+          "count": 16
+        },
+        {
+          "item": "shrinecraft:magic_essence",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "sculk_cannon",
+      "name": "Sculk Cannon",
+      "placeholder": false,
+      "ingredients": [
+        {
+          "item": "minecraft:crossbow",
+          "count": 1
+        },
+        {
+          "item": "minecraft:echo_shard",
+          "count": 16
+        },
+        {
+          "item": "minecraft:sculk_catalyst",
+          "count": 32
+        },
+        {
+          "item": "minecraft:amethyst_shard",
+          "count": 16
+        },
+        {
+          "item": "shrinecraft:magic_essence",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "strange_cape",
+      "name": "\"Strange\" Cape",
+      "placeholder": false,
+      "ingredients": [
+        {
+          "item": "minecraft:feather",
+          "count": 128
+        },
+        {
+          "item": "minecraft:slime_ball",
+          "count": 128
+        },
+        {
+          "item": "minecraft:breeze_rod",
+          "count": 128
+        },
+        {
+          "item": "shrinecraft:magic_essence",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "silvers_spawn_orb",
+      "name": "Silver\u0027s Spawn Orb",
+      "placeholder": false,
+      "ingredients": [
+        {
+          "item": "minecraft:netherite_horse_armor",
+          "count": 1
+        },
+        {
+          "item": "minecraft:saddle",
+          "count": 1
+        },
+        {
+          "item": "minecraft:sea_lantern",
+          "count": 64
+        },
+        {
+          "item": "minecraft:potion",
+          "count": 9,
+          "potion": "minecraft:strong_swiftness"
+        },
+        {
+          "item": "shrinecraft:magic_essence",
+          "count": 1
+        }
+      ]
+    }
+  ]
+}

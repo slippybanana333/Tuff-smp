@@ -1,0 +1,10 @@
+{
+  "layers": {
+    "wings": [
+      {
+        "texture": "shrinecraft:strange_cape",
+        "use_player_texture": false
+      }
+    ]
+  }
+}

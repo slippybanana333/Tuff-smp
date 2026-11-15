@@ -1,0 +1,21 @@
+{
+  "anvil_cost": 8,
+  "description": { "translate": "enchantment.shrinecraft.endless_quiver" },
+  "effects": {
+    "minecraft:ammo_use": [
+      {
+        "effect": { "type": "minecraft:set", "value": 0.0 },
+        "requirements": {
+          "condition": "minecraft:match_tool",
+          "predicate": { "items": "#minecraft:arrows" }
+        }
+      }
+    ]
+  },
+  "max_cost": { "base": 100000, "per_level_above_first": 0 },
+  "max_level": 1,
+  "min_cost": { "base": 100000, "per_level_above_first": 0 },
+  "slots": ["mainhand"],
+  "supported_items": "#shrinecraft:sculk_cannon_only",
+  "weight": 1
+}

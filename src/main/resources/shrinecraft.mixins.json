@@ -1,0 +1,17 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.tuffsmp.shrinecraft.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "DamageSourcesMixin",
+    "EntityMixin",
+    "HorseInventoryMixin",
+    "LivingEntityMixin",
+    "ServerPlayNetworkHandlerMixin",
+    "PowderSnowBlockMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

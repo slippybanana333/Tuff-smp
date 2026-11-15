@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "state=unconfigured": {
+      "model": "shrinecraft:block/shrine_unconfigured"
+    },
+    "state=configured": {
+      "model": "shrinecraft:block/shrine_configured"
+    },
+    "state=claimed": {
+      "model": "shrinecraft:block/shrine_claimed"
+    }
+  }
+}

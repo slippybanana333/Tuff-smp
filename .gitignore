@@ -1,0 +1,29 @@
+# Gradle / build output
+.gradle/
+build/
+out/
+# local test server + client runs (worlds, logs, configs)
+run/
+# in-game test screenshots
+screenshots/
+# Python caches
+__pycache__/
+*.pyc
+# editors / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+
+# Third-party (Mojang / Microsoft) reference art used only by the Python art tools - NOT redistributed here.
+# Re-create it from your own Minecraft 1.21.11 install: python3 tools/make_vanilla_refs.py (vanilla models/sprites/GUI); the netherite
+# layers, elytra, steve, inventory, polished tuff and tuff bricks textures come from the same game jar (assets/minecraft/textures).
+tools/reference/vanilla_*/
+tools/reference/armor_refs/
+tools/reference/netherite_layer_*.png
+tools/reference/elytra.png
+tools/reference/steve.png
+tools/reference/inventory.png
+tools/reference/polished_tuff.png
+tools/reference/tuff_bricks.png
+tools/reference/armor_picture.png

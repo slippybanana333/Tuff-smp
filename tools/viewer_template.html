@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tuff Display Editor</title>
+<style>
+  :root { color-scheme: dark; --bg:#1a1d25; --panel:#232733; --line:#343a4b; --txt:#e4e8f2; --dim:#8d96ad; --acc:#5ec9ff; --on:#2f6fa0; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--txt); font:13px/1.35 system-ui, sans-serif; overflow:hidden; }
+  #app { display:grid; grid-template-columns: 220px 1fr 350px; grid-template-rows: auto 1fr; height:100%; }
+  #top { grid-column:1/4; background:var(--panel); border-bottom:1px solid var(--line); padding:6px 10px; display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center; }
+  #top .grp { display:flex; gap:3px; align-items:center; }
+  #top .lab { color:var(--dim); margin-right:3px; font-size:11px; text-transform:uppercase; letter-spacing:.04em; }
+  button { background:#2b3142; color:var(--txt); border:1px solid var(--line); border-radius:4px; padding:4px 9px; cursor:pointer; font:inherit; }
+  button:hover { border-color:var(--acc); }
+  button.on { background:var(--on); border-color:var(--acc); }
+  #left, #right { background:var(--panel); overflow:auto; padding:8px; }
+  #left { border-right:1px solid var(--line); }
+  #right { border-left:1px solid var(--line); }
+  #left h3, #right h3 { margin:6px 0 4px; font-size:11px; text-transform:uppercase; color:var(--dim); letter-spacing:.05em; }
+  .item { padding:5px 6px; border-radius:4px; cursor:pointer; display:flex; align-items:center; gap:6px; }
+  .item:hover { background:#2e3446; }
+  .item.sel { background:var(--on); }
+  .item input { margin:0; }
+  #variants { display:flex; flex-wrap:wrap; gap:3px; margin:4px 0 8px; }
+  #wear { display:flex; flex-wrap:wrap; gap:3px; margin-bottom:4px; }
+  #stage { position:relative; min-width:0; min-height:0; }
+  #c { width:100%; height:100%; display:block; }
+  #hint { position:absolute; left:8px; bottom:6px; color:var(--dim); font-size:11px; pointer-events:none; text-shadow:0 1px 2px #000; }
+  .el { padding:2px 4px; cursor:pointer; border-radius:3px; display:flex; align-items:center; gap:6px; font-family:ui-monospace, monospace; font-size:12px; }
+  .el:hover { background:#2e3446; } .el.sel { background:#6b5a14; }
+  .sw { display:inline-block; width:10px; height:10px; border-radius:2px; flex:none; }
+  #elements { max-height:46vh; overflow:auto; border:1px solid var(--line); border-radius:4px; padding:3px; }
+  #selinfo { margin-top:8px; padding:8px; background:#1c202b; border:1px solid var(--line); border-radius:4px; font-family:ui-monospace, monospace; font-size:12px; word-break:break-word; }
+  #selinfo b { color:#ffd24a; }
+  #edhelp { color:var(--dim); margin:4px 0 8px; }
+  .edrow { display:grid; grid-template-columns: 1fr 66px; grid-template-areas:"l n" "r n"; gap:0 8px; align-items:center; margin:0 0 5px; }
+  .edrow label { grid-area:l; font-size:11px; color:var(--dim); }
+  .edrow input[type=range] { grid-area:r; width:100%; min-width:0; accent-color:var(--acc); margin:0; }
+  .edrow input[type=number] { grid-area:n; width:66px; background:#1c202b; color:var(--txt); border:1px solid var(--line); border-radius:4px; padding:3px 4px; font:12px ui-monospace, monospace; }
+  [hidden] { display:none !important; }
+  .edbtns { display:flex; flex-wrap:wrap; gap:4px 6px; align-items:center; margin:6px 0 10px; }
+  .edbtns label { display:flex; gap:4px; align-items:center; color:var(--dim); font-size:12px; }
+  #edout { width:100%; height:120px; background:#1c202b; color:var(--txt); border:1px solid var(--line); border-radius:4px; font:11px ui-monospace, monospace; padding:6px; resize:vertical; }
+  #edcount { color:var(--dim); font-size:12px; }
+  button.primary { background:var(--on); border-color:var(--acc); }
+  button:disabled { opacity:.4; cursor:default; }
+  button:focus-visible, input:focus-visible, textarea:focus-visible { outline:2px solid var(--acc); outline-offset:1px; }
+  @media (max-width: 900px) {
+    html, body { overflow:auto; height:auto; }
+    #app { display:block; height:auto; }
+    #stage { height:62vh; }
+    #left, #right { border:0; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="top">
+    <div class="grp"><span class="lab">View as</span>
+      <button data-ctx="model">Model (inspect)</button><button data-ctx="gui">Inventory (gui)</button><button data-ctx="ground">Ground</button>
+      <button data-ctx="fixed">Item frame (fixed)</button><button data-ctx="first">First person</button><button data-ctx="third">Third person (right hand)</button></div>
+    <div class="grp"><span class="lab">Item</span>
+      <button data-show="ours" title="your item">Ours</button><button data-show="vanilla" title="the matching vanilla item with its real vanilla position">Vanilla</button><button data-show="both" title="ours and vanilla next to each other (first and third person)">Both</button></div>
+    <div class="grp"><span class="lab">Paint</span>
+      <button data-render="textures">Textures</button><button data-render="flat">Flat colours</button><button data-render="wireframe">Wireframe</button></div>
+    <div class="grp"><span class="lab">Show</span>
+      <button id="gridToggle">16-unit grid</button><button id="refToggle">Block + player height</button><button id="extraToggle">Armor extra geometry</button>
+      <button id="cmpToggle">Size comparison</button></div>
+  </div>
+  <div id="left">
+    <h3>Items (tick = compare)</h3>
+    <div id="items"></div>
+    <h3>Model states</h3>
+    <div id="variants"></div>
+    <h3>Wear on the mannequin</h3>
+    <div id="wear"></div>
+    <div class="grp"><button id="wearAll">Wear all four</button> <button id="wearNone">Take off</button></div>
+  </div>
+  <div id="stage"><canvas id="c"></canvas><div id="hint">Drag = orbit &nbsp; wheel = zoom &nbsp; right-drag = pan &nbsp; click an element = inspect (Model view)</div></div>
+  <div id="right">
+    <h3>Position editor <span id="edctx" style="color:var(--acc)"></span></h3>
+    <div class="edbtns" id="edtarget" hidden></div>
+    <div class="edbtns" id="edgroup" hidden></div>
+    <div id="edhelp"></div>
+    <div id="edbody"></div>
+    <div class="edbtns">
+      <button id="edReset" title="put the current view back to what the mod has now">Reset this view</button>
+      <button id="edResetItem" title="undo every change to this item">Reset item</button>
+      <span id="edAllRow"><label><input type="checkbox" id="edAll"> all states of this item</label></span>
+      <label><input type="checkbox" id="edLock" checked> keep scale even</label>
+    </div>
+    <h3>Save your changes</h3>
+    <div class="edbtns" id="edSaveRow" hidden><button id="edSave" class="primary">Save changes</button><span id="edsave" style="font-size:12px"></span></div>
+    <div class="edbtns"><button id="edCopy">Copy changes</button><button id="edDownload" hidden>Save as file</button><button id="edReveal">Show / hide text</button><span id="edcount"></span></div>
+    <div id="edcopied" style="color:var(--acc);font-size:12px;margin-bottom:4px"></div>
+    <textarea id="edout" readonly spellcheck="false"></textarea>
+    <h3>Elements of this model</h3>
+    <div id="elements"></div>
+    <h3>Selected element</h3>
+    <div id="selinfo"></div>
+  </div>
+</div>
+<script>/*__THREE__*/</script>
+<script>/*__ORBIT__*/</script>
+<script>/*__DATA__*/</script>
+<script>/*__APP__*/</script>
+</body>
+</html>

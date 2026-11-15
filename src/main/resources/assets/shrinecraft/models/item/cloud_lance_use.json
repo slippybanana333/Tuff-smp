@@ -1,0 +1,22 @@
+{
+  "parent": "shrinecraft:item/cloud_lance",
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [
+        0,
+        0,
+        180
+      ],
+      "translation": [
+        0,
+        -0.7,
+        1.58
+      ],
+      "scale": [
+        0.96,
+        0.96,
+        0.96
+      ]
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "credit": "Tuff SMP - armor ITEMS are flat 2D sprites on purpose (owner request); the worn armor is the normal 3D netherite shape.",
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "shrinecraft:item/shrine_chestplate"
+  }
+}

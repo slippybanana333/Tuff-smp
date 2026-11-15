@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "shrinecraft-gametest",
+  "version": "1.0.0",
+  "name": "Tuff SMP client game tests",
+  "environment": "client",
+  "entrypoints": {
+    "fabric-client-gametest": ["dev.tuffsmp.shrinecraft.gametest.TuffClientGameTest"]
+  },
+  "depends": { "shrinecraft": "*" }
+}

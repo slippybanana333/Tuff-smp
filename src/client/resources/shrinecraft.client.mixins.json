@@ -1,0 +1,20 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.tuffsmp.shrinecraft.client.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "InventoryScreenMixin",
+    "GenericContainerScreenMixin",
+    "HandledScreenMixin",
+    "DrawContextMixin",
+    "ElytraFeatureRendererMixin",
+    "ArmorFeatureRendererMixin",
+    "LancingMixin",
+    "BossBarHudAccessor",
+    "GameMenuScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

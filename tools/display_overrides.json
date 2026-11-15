@@ -1,0 +1,633 @@
+{
+  "anaklusmos": {
+    "thirdperson_righthand": {
+      "rotation": [
+        9.0,
+        90.0,
+        0.0
+      ],
+      "translation": [
+        0.0,
+        -3.03,
+        1.49
+      ],
+      "scale": [
+        1.15,
+        1.15,
+        1.15
+      ]
+    }
+  },
+  "cloud_lance": {
+    "firstperson_righthand": {
+      "rotation": [
+        41.84,
+        75.68,
+        -74.3
+      ],
+      "translation": [
+        -0.4,
+        5.6,
+        1.4
+      ],
+      "scale": [
+        0.67,
+        0.67,
+        0.67
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        7.0,
+        90.0,
+        0.0
+      ],
+      "translation": [
+        0.0,
+        -0.7,
+        1.58
+      ],
+      "scale": [
+        0.96,
+        0.96,
+        0.96
+      ]
+    }
+  },
+  "cutlass_of_doom": {
+    "firstperson_righthand": {
+      "rotation": [
+        -145.0,
+        -61.0,
+        -98.0
+      ],
+      "translation": [
+        1.28,
+        1.1,
+        -0.4
+      ],
+      "scale": [
+        0.8,
+        1.16,
+        0.8
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        -10.0,
+        -90.0,
+        0.0
+      ],
+      "translation": [
+        0.0,
+        2.8,
+        1.1
+      ],
+      "scale": [
+        0.8,
+        1.05,
+        0.8
+      ]
+    }
+  },
+  "frost_longbow": {
+    "firstperson_righthand": {
+      "rotation": [
+        20.0,
+        0.0,
+        0.0
+      ],
+      "translation": [
+        -1.8,
+        4.45,
+        -3.9
+      ],
+      "scale": [
+        0.9,
+        0.9,
+        0.9
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        -1.0,
+        0.0,
+        0.0
+      ],
+      "translation": [
+        0.0,
+        -4.41,
+        0.8
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  "frost_longbow_pulling_0": {
+    "firstperson_righthand": {
+      "rotation": [
+        20.0,
+        0.0,
+        0.0
+      ],
+      "translation": [
+        -1.8,
+        4.45,
+        -3.9
+      ],
+      "scale": [
+        0.9,
+        0.9,
+        0.9
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        -1.0,
+        0.0,
+        0.0
+      ],
+      "translation": [
+        0.0,
+        -4.41,
+        0.8
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  "frost_longbow_pulling_1": {
+    "firstperson_righthand": {
+      "rotation": [
+        20.0,
+        0.0,
+        0.0
+      ],
+      "translation": [
+        -1.8,
+        4.45,
+        -3.9
+      ],
+      "scale": [
+        0.9,
+        0.9,
+        0.9
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        -1.0,
+        0.0,
+        0.0
+      ],
+      "translation": [
+        0.0,
+        -4.41,
+        0.8
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  "frost_longbow_pulling_2": {
+    "firstperson_righthand": {
+      "rotation": [
+        20.0,
+        0.0,
+        0.0
+      ],
+      "translation": [
+        -1.8,
+        4.45,
+        -3.9
+      ],
+      "scale": [
+        0.9,
+        0.9,
+        0.9
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        -1.0,
+        0.0,
+        0.0
+      ],
+      "translation": [
+        0.0,
+        -4.41,
+        0.8
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  "harbinger_of_death": {
+    "firstperson_righthand": {
+      "rotation": [
+        36.89,
+        69.58,
+        -59.07
+      ],
+      "translation": [
+        -1.2,
+        2.12,
+        2.63
+      ],
+      "scale": [
+        0.7,
+        0.7,
+        0.7
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        2.0,
+        90.0,
+        0.0
+      ],
+      "translation": [
+        -0.4,
+        -1.1,
+        1.4
+      ],
+      "scale": [
+        1.03,
+        1.03,
+        1.03
+      ]
+    }
+  },
+  "molten_greataxe": {
+    "firstperson_righthand": {
+      "rotation": [
+        15.46,
+        71.73,
+        -31.63
+      ],
+      "translation": [
+        -0.4,
+        4.41,
+        1.4
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        -4.0,
+        90.0,
+        0.0
+      ],
+      "translation": [
+        0.0,
+        1.1,
+        0.7
+      ],
+      "scale": [
+        0.89,
+        0.89,
+        0.89
+      ]
+    }
+  },
+  "sculk_cannon": {
+    "firstperson_righthand": {
+      "rotation": [
+        -167.18,
+        16.25,
+        168.56
+      ],
+      "translation": [
+        -4.2,
+        6.7,
+        7.0
+      ],
+      "scale": [
+        0.6,
+        0.6,
+        0.6
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        177.57,
+        -6.41,
+        172.31
+      ],
+      "translation": [
+        -0.4,
+        5.3,
+        3.9
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  "sculk_mace": {
+    "firstperson_righthand": {
+      "rotation": [
+        28.39,
+        69.72,
+        -61.72
+      ],
+      "translation": [
+        -1.8,
+        3.14,
+        3.2
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        -7.0,
+        90.0,
+        0.0
+      ],
+      "translation": [
+        0.0,
+        -1.8,
+        1.1
+      ],
+      "scale": [
+        0.99,
+        1.14,
+        0.99
+      ]
+    }
+  },
+  "silvers_spawn_orb": {
+    "firstperson_righthand": {
+      "rotation": [
+        24.95,
+        82.43,
+        -17.19
+      ],
+      "translation": [
+        -1.8,
+        7.4,
+        1.4
+      ],
+      "scale": [
+        0.92,
+        0.92,
+        0.92
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        -124.32,
+        83.85,
+        151.17
+      ],
+      "translation": [
+        -0.4,
+        3.38,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  "silvers_spawn_orb_cooldown": {
+    "firstperson_righthand": {
+      "rotation": [
+        24.95,
+        82.43,
+        -17.19
+      ],
+      "translation": [
+        -1.8,
+        7.4,
+        1.4
+      ],
+      "scale": [
+        0.92,
+        0.92,
+        0.92
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        -124.32,
+        83.85,
+        151.17
+      ],
+      "translation": [
+        -0.4,
+        3.38,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  "silvers_spawn_orb_released": {
+    "firstperson_righthand": {
+      "rotation": [
+        24.95,
+        82.43,
+        -17.19
+      ],
+      "translation": [
+        -1.8,
+        7.4,
+        1.4
+      ],
+      "scale": [
+        0.92,
+        0.92,
+        0.92
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        -124.32,
+        83.85,
+        151.17
+      ],
+      "translation": [
+        -0.4,
+        3.38,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  "sculk_cannon_pulling_0": {
+    "thirdperson_righthand": {
+      "rotation": [
+        -90.0,
+        0.0,
+        -180.0
+      ],
+      "translation": [
+        0.0,
+        -3.506,
+        9.118
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        -180.0,
+        0.0,
+        -180.0
+      ],
+      "translation": [
+        -3.249,
+        7.72,
+        2.599
+      ],
+      "scale": [
+        0.6,
+        0.6,
+        0.6
+      ]
+    }
+  },
+  "sculk_cannon_pulling_1": {
+    "thirdperson_righthand": {
+      "rotation": [
+        -90.0,
+        0.0,
+        -180.0
+      ],
+      "translation": [
+        0.0,
+        -3.506,
+        9.118
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        -180.0,
+        0.0,
+        -180.0
+      ],
+      "translation": [
+        -3.249,
+        7.72,
+        2.599
+      ],
+      "scale": [
+        0.6,
+        0.6,
+        0.6
+      ]
+    }
+  },
+  "sculk_cannon_pulling_2": {
+    "thirdperson_righthand": {
+      "rotation": [
+        -90.0,
+        0.0,
+        -180.0
+      ],
+      "translation": [
+        0.0,
+        -3.506,
+        9.118
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        -180.0,
+        0.0,
+        -180.0
+      ],
+      "translation": [
+        -3.249,
+        7.72,
+        2.599
+      ],
+      "scale": [
+        0.6,
+        0.6,
+        0.6
+      ]
+    }
+  },
+  "sculk_cannon_charged": {
+    "thirdperson_righthand": {
+      "rotation": [
+        -90.0,
+        0.0,
+        -180.0
+      ],
+      "translation": [
+        0.0,
+        -3.506,
+        9.118
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        -180.0,
+        0.0,
+        -180.0
+      ],
+      "translation": [
+        -3.249,
+        7.72,
+        2.599
+      ],
+      "scale": [
+        0.6,
+        0.6,
+        0.6
+      ]
+    }
+  }
+}

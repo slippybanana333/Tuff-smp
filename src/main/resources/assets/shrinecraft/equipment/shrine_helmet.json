@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "shrinecraft:shrine_helmet"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "shrinecraft:shrine_helmet"
+      }
+    ]
+  }
+}

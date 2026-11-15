@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "shrinecraft:block/shrine_unconfigured"
+  }
+}

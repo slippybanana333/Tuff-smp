@@ -1,0 +1,116 @@
+{
+  "format": "tuffsmp-worn-v1",
+  "_help": "How each WORN piece is placed on the player (edited with the Display Editor). Values are in 1/16-block units in the player MODEL space (x = player's left, y = DOWN, z = BACK). The piece is moved/rotated/scaled around its pivot.",
+  "pieces": {
+    "shrine_helmet": {
+      "pivot": [
+        0,
+        -4,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "shrine_chestplate": {
+      "pivot": [
+        0,
+        6,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "shrine_leggings": {
+      "pivot": [
+        0,
+        18,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "shrine_boots": {
+      "pivot": [
+        0,
+        21,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "strange_cape": {
+      "pivot": [
+        0,
+        0,
+        2
+      ],
+      "translation": [
+        0.0,
+        1.4,
+        0.0
+      ],
+      "rotation": [
+        5.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        0.41
+      ]
+    }
+  }
+}
