@@ -31,3 +31,4 @@ tools/reference/armor_picture.png
 # recipe-reveal generator: cache + generated data embed Mojang textures - never commit
 tools/reveal/.cache/
 tools/reveal/reveal_data.js
+tools/reveal/objective_data.js
