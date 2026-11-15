@@ -437,9 +437,9 @@
     if (legend.visible) {
       legend.position.set(0, hover + Math.sin(t * 1.5) * 0.03 - (1 - easeOutCubic(lp)) * 0.7, 0);
       legend.scale.setScalar(Math.max(0.0001, easeOutBack(lp)));
-      // SIDE view first (the broad profile - head and both bosses - faces the camera), then it turns 90 degrees to the END view and stays
+      // SIDE view (the broad profile - head and both bosses - faces the camera). Optional: legendaryTurn=true turns it 90 degrees to the END view
       const turn = clamp((t - T.turnStart) / T.turnTime), turnE = turn < 0.5 ? 4 * turn * turn * turn : 1 - Math.pow(-2 * turn + 2, 3) / 2;
-      legend.rotation.set(Math.sin(t * 1.1) * 0.03, camState.yaw + turnE * Math.PI / 2 + Math.sin(t * 0.8) * 0.04, Math.sin(t * 0.9) * 0.025);
+      legend.rotation.set(Math.sin(t * 1.1) * 0.03, camState.yaw + (C.legendaryTurn ? turnE * Math.PI / 2 : 0), Math.sin(t * 0.9) * 0.025);   // legendaryTurn=false: stays in its SIDE view, no turning
     }
     legendGlow.visible = legend.visible; legendGlow.position.set(0, hover, 0);
     legendGlowMat.opacity = clamp(lp * 1.2) * (0.14 + 0.06 * Math.sin(t * 2.0)) * (t > tb ? 1 : 0);

@@ -55,7 +55,7 @@ DURATION = 10.0
 ITEM_LOOK = {
     "default": dict(titleColors=[[120, 255, 232], [70, 195, 255], [175, 135, 255]], accent=[0.4, 0.95, 1.0], accentLight=0x4FF0FF,
                     legendaryGlow=["rgba(120,255,240,0.9)", "rgba(40,160,200,0.35)"], legendaryEmissive=0x061A20, flashColor="150,255,248",
-                    legendaryLength=1.4, legendaryHover=2.02, legendarySpin=0.25),
+                    legendaryLength=1.4, legendaryHover=2.02, legendaryTurn=False),
 }
 # everything tinted for the item (the reference was orange for its crafting table; the owner asked for sculk teal here)
 THEME = {
