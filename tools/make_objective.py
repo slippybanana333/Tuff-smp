@@ -11,6 +11,7 @@ five little stars; it wipes in from the left edge, holds, and wipes out). The ic
 Outputs (1920x1080, 60 fps, ~5.6 s) - pick with --formats mov,webm,preview (default: mov):
   * <item>_objective.webm  VP9 WITH ALPHA (plays in Chrome/Edge/Firefox; most editors take it)
   * <item>_objective.mov   ProRes 4444 WITH ALPHA (Premiere / DaVinci / Final Cut / After Effects)
+  * <item>_objective_greenscreen.mp4  the clip on pure chroma green (#00FF00) - H.264 has no alpha, key the green out in your editor
   * <item>_objective_preview.mp4  the same clip on a dark checkerboard, like the reference recording (easy to watch anywhere)
 Text lines have at most ~34 characters. Vanilla font textures are read from the game jar at run time (not stored in the repo).
 Needs: node + playwright (global), ffmpeg with libvpx-vp9 and prores_ks.
@@ -60,7 +61,7 @@ def main():
     ap.add_argument("--line2", default=None)
     ap.add_argument("--title", default="New Objective")
     ap.add_argument("--theme", default=None, choices=sorted(THEMES))
-    ap.add_argument("--formats", default="mov", help="comma list of: mov (ProRes 4444 alpha), webm (VP9 alpha), preview (mp4 on a checkerboard)")
+    ap.add_argument("--formats", default="mov", help="comma list of: mov (ProRes 4444 alpha), webm (VP9 alpha), green (mp4 on chroma green), preview (mp4 on a checkerboard)")
     ap.add_argument("--preview", default=None, help="comma list of seconds: render only these frames as PNGs (on a checkerboard)")
     ap.add_argument("--out-dir", default=os.path.join(ROOT, "build", "objective"))
     a = ap.parse_args()
@@ -111,12 +112,17 @@ def main():
     base = os.path.join(a.out_dir, f"{item}_objective")
     common = ["ffmpeg", "-y", "-v", "error", "-framerate", str(a.fps), "-i"]
     written = []
-    if fmts & {"mov", "webm"}:
+    if fmts & {"mov", "webm", "green"}:
         render(False, d_alpha)
         if "webm" in fmts:
             subprocess.check_call(common + [os.path.join(d_alpha, "f_%05d.png"), "-c:v", "libvpx-vp9", "-pix_fmt", "yuva420p", "-b:v", "0", "-crf", "22", "-auto-alt-ref", "0", base + ".webm"]); written.append(base + ".webm")
         if "mov" in fmts:
             subprocess.check_call(common + [os.path.join(d_alpha, "f_%05d.png"), "-c:v", "prores_ks", "-profile:v", "4444", "-pix_fmt", "yuva444p10le", "-vendor", "apl0", base + ".mov"]); written.append(base + ".mov")
+    if "green" in fmts:
+        # H.264 has no alpha: the transparent frames are laid over pure chroma green (#00FF00) for keying out in an editor
+        subprocess.check_call(["ffmpeg", "-y", "-v", "error", "-f", "lavfi", "-i", f"color=c=0x00FF00:s=1920x1080:r={a.fps}", "-framerate", str(a.fps), "-i", os.path.join(d_alpha, "f_%05d.png"),
+                               "-filter_complex", "[0:v][1:v]overlay=shortest=1:format=auto", "-c:v", "libx264", "-preset", "slow", "-crf", "12", "-pix_fmt", "yuv420p", "-movflags", "+faststart", base + "_greenscreen.mp4"])
+        written.append(base + "_greenscreen.mp4")
     if "preview" in fmts:
         render(True, d_chk)
         subprocess.check_call(common + [os.path.join(d_chk, "f_%05d.png"), "-c:v", "libx264", "-preset", "slow", "-crf", "16", "-pix_fmt", "yuv420p", "-movflags", "+faststart", base + "_preview.mp4"]); written.append(base + "_preview.mp4")
