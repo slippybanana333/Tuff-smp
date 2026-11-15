@@ -2,10 +2,12 @@ package dev.tuffsmp.shrinecraft.item;
 
 import dev.tuffsmp.shrinecraft.ability.Abilities;
 import dev.tuffsmp.shrinecraft.registry.ModComponents;
+import dev.tuffsmp.shrinecraft.util.Enchants;
 import dev.tuffsmp.shrinecraft.util.Msg;
 import java.util.function.Consumer;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.TooltipDisplayComponent;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -16,6 +18,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -45,7 +48,21 @@ public class FrostLongbowItem extends BowItem {
     public static final float FREEZE_SECONDS = 5.0F;
     /** True = a full-draw hit ignores armor (true damage). False = normal arrow damage. */
     public static final boolean TRUE_DAMAGE = true;
+    /** Built-in enchantments (owner: all bow enchants except Flame and Mending). */
+    public static final int POWER_LEVEL = 5;
+    public static final int PUNCH_LEVEL = 2;
+    public static final int UNBREAKING_LEVEL = 3;
     // ===================================================================================
+
+    /** The stack the Shrine hands out: every bow enchantment except Flame and Mending (owner request; no curses). */
+    public static ItemStack createStack(RegistryWrapper.WrapperLookup registries) {
+        return Enchants.on(new ItemStack(dev.tuffsmp.shrinecraft.registry.ModItems.FROST_LONGBOW), registries)
+            .add(Enchantments.POWER, POWER_LEVEL)
+            .add(Enchantments.PUNCH, PUNCH_LEVEL)
+            .add(Enchantments.INFINITY, 1)
+            .add(Enchantments.UNBREAKING, UNBREAKING_LEVEL)
+            .apply();
+    }
 
     /** Marker put on arrows that came from a full draw (armor-ignoring damage). */
     public static final String FROST_ARROW_TAG = "shrinecraft_frost_arrow";

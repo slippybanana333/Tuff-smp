@@ -9,6 +9,7 @@ import com.google.gson.JsonParser;
 import dev.tuffsmp.shrinecraft.ShrineCraft;
 import dev.tuffsmp.shrinecraft.item.CloudLanceItem;
 import dev.tuffsmp.shrinecraft.item.CutlassOfDoomItem;
+import dev.tuffsmp.shrinecraft.item.FrostLongbowItem;
 import dev.tuffsmp.shrinecraft.item.HarbingerOfDeathItem;
 import dev.tuffsmp.shrinecraft.item.MoltenGreataxeItem;
 import dev.tuffsmp.shrinecraft.item.SculkCannonItem;
@@ -105,7 +106,7 @@ public final class ShrineRecipes {
 
         list.add(new ShrineRecipe("frost_longbow", "Frost Longbow", withEssence(List.of(
             i(Items.BOW, 1), i(Items.ICE, 64), i(Items.PACKED_ICE, 128), i(Items.BLUE_ICE, 256), i(Items.DIAMOND, 64))),
-            r -> new ItemStack(ModItems.FROST_LONGBOW), false));
+            FrostLongbowItem::createStack, false));
 
         list.add(new ShrineRecipe("cloud_lance", "Cloud Lance", withEssence(List.of(
             i(Items.DIAMOND_SPEAR, 1), i(Items.BREEZE_ROD, 64),

@@ -63,17 +63,17 @@ public class SculkMaceItem extends MaceItem {
     /**
      * Enchantments that each tier applies. Index = tier. Each tier is the COMPLETE set for that tier: when the tier changes,
      * Density and Wind Burst are removed and the new set is applied (vanilla allows Density and Wind Burst together).
-     * Owner's ladder: tier 1 = Density I, tier 2 = Density II, tier 3 = Wind Burst I, tier 4 = Density III,
-     * tier 5 = Wind Burst II and unlocks the Sculk Wave ability.
+     * Owner's ladder (2026-11-15, supersedes the earlier list): tier 1 = Density I; tier 2 = Density II; tier 3 = Density II + Wind Burst I;
+     * tier 4 = Density III + Wind Burst I; tier 5 = Density III + Wind Burst II and unlocks the Sculk Wave ability.
      * Format: { enchantment, level }.
      */
     public static final Object[][][] TIER_ENCHANTS = {
         /* tier 0 */ {},
         /* tier 1 */ {{Enchantments.DENSITY, 1}},
         /* tier 2 */ {{Enchantments.DENSITY, 2}},
-        /* tier 3 */ {{Enchantments.WIND_BURST, 1}},
-        /* tier 4 */ {{Enchantments.DENSITY, 3}},
-        /* tier 5 */ {{Enchantments.WIND_BURST, 2}},
+        /* tier 3 */ {{Enchantments.DENSITY, 2}, {Enchantments.WIND_BURST, 1}},
+        /* tier 4 */ {{Enchantments.DENSITY, 3}, {Enchantments.WIND_BURST, 1}},
+        /* tier 5 */ {{Enchantments.DENSITY, 3}, {Enchantments.WIND_BURST, 2}},
     };
     // ===================================================================================
 

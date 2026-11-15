@@ -64,3 +64,12 @@ Key discovery: the in-browser viewer's THIRD-PERSON view does not reproduce the 
 - [x] T5. Sculk Cannon "floating" in hand - base (uncharged) third person now vanilla uncharged crossbow rotation [-90, 0, -60], translation re-derived FROM the verified charged pose (charged/drawing states untouched). Verified: hangs at the side like vanilla.
 - [x] Rebuilt deliverables again (jar + resource pack + viewer pages) and re-ran everything: check_models 116 ok, selftest running for the final pass.
 - First-person poses unchanged this round (lance first-person fix from the earlier round stands).
+
+## Tester round 3 (2026-11-15, frost longbow + lance first person) - ALL DONE + VERIFIED
+
+- [x] F1. Frost Longbow built-in enchants: Power V, Punch II, Infinity I, Unbreaking III (all bow enchants except Flame + Mending, no curses) - new FrostLongbowItem.createStack, wired into the Shrine recipe (config file never overrides the output fn -> no CONFIG_VERSION bump). Selftest check added.
+- [x] F2. Full-draw true damage 1.5 hearts: ALREADY in place - re-measured live: 30/30 hits, avg 2.95 HP = 1.48 hearts vs Prot-IV-diamond player (spread 2.2-4.0 HP = vanilla arrow-crit chance). No code change.
+- [x] F3. Bow cooldown bar: AbilityBarHud ORDER was missing FrostLongbowItem - added. Verified in game (each_bow_active 5.8s draining / each_bow_recharging 27s refilling). Gametest got bow jobs.
+- [x] F4. Sculk Mace ladder CORRECTED AGAIN by owner - final cumulative: t1 D1, t2 D2, t3 D2+WB1, t4 D3+WB1, t5 D3+WB2 + wave. TIER_ENCHANTS + selftest updated.
+- [x] F5. Cloud Lance first person leaned BACK - mirrored the pose (rot [-18, -75.68, -74.3], grip-pinned t [-0.4, 3.0, 0.618]). Verified in game: head points forward toward the crosshair.
+- [x] Rebuild + selftest final pass.

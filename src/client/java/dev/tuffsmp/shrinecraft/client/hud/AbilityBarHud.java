@@ -60,7 +60,8 @@ public final class AbilityBarHud {
     /** Every weapon with an ability, in a FIXED order so bars do not jump around when you switch items. */
     private static final List<Class<? extends Item>> ORDER = List.of(
         dev.tuffsmp.shrinecraft.item.MoltenGreataxeItem.class, dev.tuffsmp.shrinecraft.item.CutlassOfDoomItem.class,
-        dev.tuffsmp.shrinecraft.item.SculkMaceItem.class, dev.tuffsmp.shrinecraft.item.CloudLanceItem.class,
+        dev.tuffsmp.shrinecraft.item.SculkMaceItem.class, dev.tuffsmp.shrinecraft.item.FrostLongbowItem.class,
+        dev.tuffsmp.shrinecraft.item.CloudLanceItem.class,
         dev.tuffsmp.shrinecraft.item.SilversSpawnOrbItem.class);
 
     /** Animation state of one bar (kept between frames). */

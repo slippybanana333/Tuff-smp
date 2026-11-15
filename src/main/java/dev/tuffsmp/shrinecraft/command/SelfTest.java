@@ -302,7 +302,14 @@ final class SelfTest {
         check("Cutlass: NO Knockback, NO Fire Aspect", level(cut, Enchantments.KNOCKBACK) == 0 && level(cut, Enchantments.FIRE_ASPECT) == 0);
         ItemStack mace = SculkMaceItem.createStack(reg);
         check("Mace tier 0 has zero enchantments", !mace.hasEnchantments());
-        int[][] expectDensityWind = {{0, 0}, {1, 0}, {2, 0}, {0, 1}, {3, 0}, {0, 2}};
+        // the Frost Longbow: every bow enchantment except Flame and Mending (owner request)
+        ItemStack bow = FrostLongbowItem.createStack(reg);
+        check("Frost Longbow: Power 5, Punch 2, Infinity 1, Unbreaking 3",
+            level(bow, Enchantments.POWER) == 5 && level(bow, Enchantments.PUNCH) == 2
+                && level(bow, Enchantments.INFINITY) == 1 && level(bow, Enchantments.UNBREAKING) == 3);
+        check("Frost Longbow: NO Flame, NO Mending, no curses", level(bow, Enchantments.FLAME) == 0 && level(bow, Enchantments.MENDING) == 0
+            && level(bow, Enchantments.VANISHING_CURSE) == 0 && level(bow, Enchantments.BINDING_CURSE) == 0);
+        int[][] expectDensityWind = {{0, 0}, {1, 0}, {2, 0}, {2, 1}, {3, 1}, {3, 2}};
         for (int t = 1; t <= 5; t++) {
             SculkMaceItem.setTier(mace, t, reg);
             check("Mace tier " + t + ": Density " + expectDensityWind[t][0] + ", Wind Burst " + expectDensityWind[t][1],

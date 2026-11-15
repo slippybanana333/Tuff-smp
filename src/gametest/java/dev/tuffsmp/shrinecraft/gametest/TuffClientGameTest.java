@@ -258,6 +258,7 @@ public class TuffClientGameTest implements FabricClientGameTest {
                     {"greataxe", "active"}, {"greataxe", "recharging"}, {"greataxe", "ready"},
                     {"cutlass", "active"}, {"cutlass", "recharging"}, {"cutlass", "ready"},
                     {"mace", "active"}, {"mace", "recharging"}, {"mace", "ready"},
+                    {"bow", "active"}, {"bow", "recharging"}, {"bow", "ready"},
                     {"lance", "recharging"}, {"lance", "ready"},
                     {"orb", "ready"}, {"orb", "out"}, {"orb", "recharging"},
                 };
@@ -286,6 +287,11 @@ public class TuffClientGameTest implements FabricClientGameTest {
                                 dev.tuffsmp.shrinecraft.item.SculkMaceItem.setTier(st, 5, reg);
                                 if (state.equals("active")) dev.tuffsmp.shrinecraft.ability.Abilities.start(st, now - 5 * 20, 15 * 20, 60 * 20);
                                 if (state.equals("recharging")) dev.tuffsmp.shrinecraft.ability.Abilities.start(st, now - 38 * 20, 15 * 20, 60 * 20);
+                            }
+                            case "bow" -> {
+                                st = dev.tuffsmp.shrinecraft.item.FrostLongbowItem.createStack(reg);
+                                if (state.equals("active")) dev.tuffsmp.shrinecraft.ability.Abilities.start(st, now - 2 * 20, 10 * 20, 45 * 20);
+                                if (state.equals("recharging")) dev.tuffsmp.shrinecraft.ability.Abilities.start(st, now - 16 * 20, 10 * 20, 45 * 20);
                             }
                             case "lance" -> {
                                 st = new net.minecraft.item.ItemStack(dev.tuffsmp.shrinecraft.registry.ModItems.CLOUD_LANCE);
